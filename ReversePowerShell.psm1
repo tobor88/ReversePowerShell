@@ -16,7 +16,7 @@ Function Start-Listener {
     Try
     {
 
-        Write-Host "Listner opened on port $Port `nWaiting for TCP Connection....`" -ForegroundColor 'Green'
+        Write-Host "Listner opened on port $Port `nWaiting for TCP Connection...." -ForegroundColor 'Green'
 
         $Listener.Start();
 
