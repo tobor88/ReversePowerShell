@@ -11,25 +11,69 @@ Function Start-Listener {
         [int32]$Port
     ) # End param
 
-    $Listener = [System.Net.Sockets.TcpListener]$Port;
-
     Try
     {
 
-        Write-Host "Listner opened on port $Port `nWaiting for TCP Connection...." -ForegroundColor 'Green'
+        Write-Verbose ("Listening on [0.0.0.0] (port " + $Port + ")") -ForegroundColor 'Green'
 
-        $Listener.Start();
+        $Socket = New-Object System.Net.Sockets.TcpListener('127.0.0.1', $Port);
 
-        While($True)
+        If($Socket -eq $Null)
         {
 
-            $Client = $Listener.AcceptTcpClient();
+            Exit
 
-            Write-Host "Connected!";
+        } # End If
 
-            $client.Close();
+      $Socket.Start()
 
-        } # End While
+      $Client = $Socket.AcceptTcpClient()
+
+      Write-Host "[*] Connection Established." -ForegroundColor 'Green'
+
+      $Stream = $Client.GetStream()
+
+      $Writer = New-Object System.IO.StreamWriter($Stream)
+      $Buffer = New-Object System.Byte[] 2048
+      $Encoding = New-Object System.Text.AsciiEncoding
+
+      Do
+      {
+
+          $Command = Read-Host
+
+          $Writer.WriteLine($Command)
+
+          $Writer.Flush();
+
+          If($Command -eq "exit")
+          {
+
+              Break
+
+          } # End If
+
+          $Read = $Null
+
+          While($Stream.DataAvailable -or $Read -eq $Null)
+          {
+
+              $Read = $Stream.Read($Buffer, 0, 2048)
+
+              $Out = $Encoding.GetString($Buffer, 0, $Read)
+
+              Write-Output $Out
+
+          } # End While
+
+      } While ($Client.Connected -eq $True) # End Do While Loop
+
+      $Socket.Stop()
+
+      $Client.Close();
+
+      $Stream.Dispose()
+
     } #End Try
     Catch
     {
