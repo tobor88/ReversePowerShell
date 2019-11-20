@@ -2,7 +2,7 @@
 # I know Get is not the correct Verb to use but I like it and dont want to confuse this with other Invoke-ReverseShells
 #==========================================================================================================================
 
-Function Get-ReverseShell {
+Function Invoke-ReversePowerShell {
     [CmdletBinding()]
         param(
             [Parameter(
@@ -11,7 +11,6 @@ Function Get-ReverseShell {
                 ValueFromPipeline=$True,
                 ValueFromPipelineByPropertyName = $True
             )] # End Parameter
-                [Alias('IP')]
                 [ValidateNotNullorEmpty()]
             [IPAddress]$IpAddress,
 
@@ -20,7 +19,6 @@ Function Get-ReverseShell {
                 Position=1,
                 ValueFromPipeline=$False
             )] # End Parameter
-                [Alias('p','P')]
                 [ValidateNotNullorEmpty()]
                 [ValidateRange(1,65535)]
             [int32]$Port
@@ -111,4 +109,4 @@ Function Get-ReverseShell {
 
     } # End While
 
-} # End Function Get-ReverseShell
+} # End Function Invoke-ReversePowerShell
