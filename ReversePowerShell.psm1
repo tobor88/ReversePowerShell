@@ -1,7 +1,3 @@
-#==========================================================================================================================
-# I know Get is not the correct Verb to use but I like it and dont want to confuse this with other Invoke-ReverseShells
-#==========================================================================================================================
-
 Function Invoke-ReversePowerShell {
     [CmdletBinding()]
         param(
