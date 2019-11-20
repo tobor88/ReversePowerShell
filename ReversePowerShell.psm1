@@ -11,12 +11,9 @@ Function Start-Listener {
         [int32]$Port
     ) # End param
 
-    Try
-    {
+        Write-Host ("Listening on [0.0.0.0] (port " + $Port + ")") -ForegroundColor 'Green'
 
-        Write-Verbose ("Listening on [0.0.0.0] (port " + $Port + ")") -ForegroundColor 'Green'
-
-        $Socket = New-Object System.Net.Sockets.TcpListener('127.0.0.1', $Port);
+        $Socket = New-Object System.Net.Sockets.TcpListener('0.0.0.0', $Port);
 
         If($Socket -eq $Null)
         {
@@ -73,14 +70,6 @@ Function Start-Listener {
       $Client.Close();
 
       $Stream.Dispose()
-
-    } #End Try
-    Catch
-    {
-
-        Write-Host "Listener closed " -ForegroundColor 'Red'
-
-    } # End Catch
 
 } # End Function Start-Listener
 
