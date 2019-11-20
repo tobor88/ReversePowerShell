@@ -8,7 +8,7 @@ Function Start-Listener {
             HelpMessage='Enter a port to listen on. Valid ports are between 1 and 65535'
             )] # End Parameter
         [ValidateRange(1,65535)]
-        [in32]$Port
+        [int32]$Port
     ) # End param
 
     $Listener = [System.Net.Sockets.TcpListener]$Port;
