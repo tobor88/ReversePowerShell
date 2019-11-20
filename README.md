@@ -3,7 +3,7 @@ Functions that can be used to gain Reverse Shells with PowerShell
 
 #### INSTALL THE MODULE
 Install this module by placing the cloned folder "ReversePowerShell" inside the following directory location.
- 'C:\Users\\$env:USERNAME\Documents\WindowsPowerShell\Modules\ReversePowerShell'
+ 'C:\Users`\$env:USERNAME\Documents\WindowsPowerShell\Modules\ReversePowerShell'
 
 Once there it can be imported into a PowerShell session using the following command.
 ```powershell
