@@ -15,7 +15,7 @@ BEGIN
     {
 
         $ComputerName = $env:COMPUTERNAME
-        
+
     } # End If
 
 } # End BEGIN
@@ -25,7 +25,7 @@ PROCESS
 
     Write-Host "Checking for Reverse Shells that connect to a System.Net.Sockets.TcpListener object" -ForegroundColor Cyan
 
-    $TcpListenerCheck = Get-WinEvent -LogName Security -FilterXPath "*[System[EventID=4656 and TimeCreated[timediff(@SystemTime) <= 86400000]] and EventData[Data[@Name='SubjectUserName']!='paessler'] and EventData[Data[@Name='ObjectServer']='WS-Management Listener']]" 
+    $TcpListenerCheck = Get-WinEvent -LogName Security -FilterXPath "*[System[EventID=4656 and TimeCreated[timediff(@SystemTime) <= 86400000]] and EventData[Data[@Name='SubjectUserName']!='paessler'] and EventData[Data[@Name='ObjectServer']='WS-Management Listener']]"
 
 
     Write-Host "Checking for a Reverse Shell created by a tool such as PowerCat that execute Reverse Shell commands as a process using WSMAN"
