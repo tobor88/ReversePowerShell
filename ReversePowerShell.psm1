@@ -13,7 +13,7 @@ Function Start-Listener {
 
         Write-Host ("Listening on [0.0.0.0] (port " + $Port + ")") -ForegroundColor 'Green'
 
-        $Socket = New-Object System.Net.Sockets.TcpListener('0.0.0.0', $Port);
+        $Socket = New-Object -TypeName System.Net.Sockets.TcpListener('0.0.0.0', $Port);
 
         If($Socket -eq $Null)
         {
@@ -30,9 +30,9 @@ Function Start-Listener {
 
       $Stream = $Client.GetStream()
 
-      $Writer = New-Object System.IO.StreamWriter($Stream)
-      $Buffer = New-Object System.Byte[] 2048
-      $Encoding = New-Object System.Text.AsciiEncoding
+      $Writer = New-Object -TypeName System.IO.StreamWriter($Stream)
+      $Buffer = New-Object -TypeName System.Byte[] 2048
+      $Encoding = New-Object -TypeName System.Text.AsciiEncoding
 
       Do
       {
