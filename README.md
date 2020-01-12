@@ -1,5 +1,8 @@
 # ReversePowerShell
-Functions that can be used to gain Reverse Shells with PowerShell
+Functions that can be used to gain Reverse Shells with PowerShell.
+
+#### BLUE TEAM DISCOVERY 
+Find-ReverseShell.psm1 can be used to search the Windows Event Log for when a Reverse Shell is created that uses a System.Net.Sockets.TcpListener object. This will discover any reverse shell that creates a TcpListener object and not just the below module. This method does not catch PowerCat.ps1 which I am still looking for a good way to discover.
 
 #### INSTALL THE MODULE
 Install this module by placing the cloned folder "ReversePowerShell" inside the following directory location.
