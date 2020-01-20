@@ -127,9 +127,8 @@ Function Start-Bind {
             [Parameter(
                 Mandatory=$True,
                 Position=1,
-                ValueFromPipeline=$False)]  # End Parameter
-                HelpMessage='Enter a port to listen on. Valid ports are between 1 and 65535. Example: 1234'
-                )] # End Parameter
+                ValueFromPipeline=$False,
+                HelpMessage='Enter a port to listen on. Valid ports are between 1 and 65535. Example: 1234')] # End Parameter
             [ValidateRange(1,65535)]
             [int32]$Port
         )  # End param
@@ -310,4 +309,4 @@ Function Invoke-ReversePowerShell {
             Start-Sleep -Seconds 30
         } # End Catch
     } # End While
-} # End Function Invoke-ReversePowerShell 
+} # End Function Invoke-ReversePowerShell
