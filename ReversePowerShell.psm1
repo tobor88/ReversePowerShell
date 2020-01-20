@@ -1,4 +1,4 @@
-# Start-listener
+# Start-Listener
 <#
 .SYNOPSIS
     This cmdlet is for creating a listener that a reverse shell can attach too.
@@ -218,7 +218,7 @@ Function Invoke-ReversePowerShell {
                 ValueFromPipelineByPropertyName = $True,
                 HelpMessage="Enter the IP Address of your attack machine. Example: 10.10.14.21"
             )] # End Parameter
-                [ValidateNotNullorEmpty()]
+            [ValidateNotNullorEmpty()]
             [IPAddress]$IpAddress,
 
             [Parameter(
