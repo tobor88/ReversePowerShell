@@ -9,7 +9,7 @@
 
 
 .SYNTAX
-    Start-Listener [-Port <int32>]
+    Start-Listener -Port <int32>
 
 
 .PARAMETER
@@ -108,7 +108,7 @@ Function Start-Listener {
 
 
 .SYNTAX
-    Start-Bind [-Port <int32>]
+    Start-Bind -Port <int32>
 
 
 .PARAMETER
@@ -191,7 +191,7 @@ Function Start-Bind {
 
 
 .SYNTAX
-    Invoke-ReversePowerShell [-IpAddress <string>] [-Port <int32>]
+    Invoke-ReversePowerShell -IpAddress <string> -Port <int32>
 
 
 .PARAMETER
