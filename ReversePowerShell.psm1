@@ -310,4 +310,4 @@ Function Invoke-ReversePowerShell {
             Start-Sleep -Seconds 30
         } # End Catch
     } # End While
-} # End Function Invoke-ReversePowerShell
+} # End Function Invoke-ReversePowerShell 
