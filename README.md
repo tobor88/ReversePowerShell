@@ -17,6 +17,10 @@ Once there it can be imported into a PowerShell session using the following comm
 ```powershell
 Import-Module ReversePowerShell
 ```
+Or in cases where you want to import the module from whatever file you are in...
+```powershell
+Import-Module .\ReversePowerShell.psm1
+```
 
 If your are able to use Invoke-Expresion (IEX) this module can be imported using the following command.
 You can also copy and paste the functions into your PowerShell session so the cmdlets become available to run.
