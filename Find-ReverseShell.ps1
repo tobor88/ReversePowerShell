@@ -73,6 +73,7 @@
 
 #>
 Function Find-ReverseShell {
+    [CmdletBinding()]
         param(
             [Parameter(
                 Mandatory=$False,
