@@ -467,8 +467,6 @@ Function Invoke-ReversePowerShell {
 
             } # End If
 
-            Clear-Host
-
             Write-Information "[*] If you wish to clear your command history when exiting shell uncomment the below lines"
             # Clear-History
             # Clear-Content -Path ((Get-PSReadlineOption).HistorySavePath) -Force
