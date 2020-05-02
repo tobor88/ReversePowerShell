@@ -415,8 +415,6 @@ Function Invoke-ReversePowerShell {
                 If($Command.StartsWith("kill-link"))
                 {
 
-                    Clear-Host
-
                     Write-Information "[*] If you wish to clear your command history when exiting shell uncomment the below lines"
                     # Clear-History
                     # Clear-Content -Path ((Get-PSReadlineOption).HistorySavePath) -Force
@@ -439,7 +437,6 @@ Function Invoke-ReversePowerShell {
 
                     $Error[0].ToString() + $Error[0].InvocationInfo.PositionMessage
                     $ExecuteCmdAgain  =  "ERROR: " + $Error[0].ToString() + "`n`n" + "PS " + (Get-Location).Path + "> "
-                    Clear-Host
 
                 } # End Catch
                 
