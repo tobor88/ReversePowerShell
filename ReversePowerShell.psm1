@@ -226,7 +226,7 @@ Function Start-Bind {
         Write-Host "[*] PowerShell.exe is bound to port $PortString" -ForegroundColor "Green"
         $Listener.Start()
 
-        While ($true) 
+        While ($True) 
         {
             
             Write-Verbose "Begin loop allowing Ctrl+C to stop the listener"
