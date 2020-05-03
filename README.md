@@ -1,4 +1,9 @@
 # ReversePowerShell
+#
+NOW IN POWERSHELL GALLERY
+Install-Module ReversePowerShell
+#
+#
 Functions that can be used to gain Reverse Shells with PowerShell. Invoke-ReversePowerShell function can be used
 to connect to Start-Listener as well as netcat and metasploit modules however it can not connect to Start-Bind.
 I will add a tool for that in the future. This is a PowerShell module meaning it only contains functions/cmdlets to be imported into a PowerShell session. If you wish to execute one of the commands whenever the file is run just add the command you wish to execute to the bottom of the file.
