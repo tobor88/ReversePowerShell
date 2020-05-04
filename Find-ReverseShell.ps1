@@ -18,29 +18,29 @@
     -ComputerName [<String>]
         This parameter is for helping to better define a connection you may want to look for. This parameter is currently
         not in use for this cmdlet.
-        
+
             Required?                    false
             Position?                    0
             Default value                none
             Accept pipeline input?       false
             Accept wildcard characters?  false
-    
+
     -Path [<String>]
-        Specifies a path to one locations. Wildcards are not permitted. 
+        Specifies a path to one locations. Wildcards are not permitted.
 
         Required?                    false
         Position?                    1
         Default value                none
         Accept pipeline input?       false
         Accept wildcard characters?  false
-        
+
     <CommonParameters>
         This cmdlet supports the common parameters: Verbose, Debug,
         ErrorAction, ErrorVariable, WarningAction, WarningVariable,
         OutBuffer, PipelineVariable, and OutVariable. For more information, see
         about_CommonParameters (https:/go.microsoft.com/fwlink/?LinkID=113216).
-        
-        
+
+
 .SYNTAX
     Find-ReverseShell [-ComputerName <string>] [-FilePath <string>]
 
@@ -60,9 +60,8 @@
     Author: Robert H. Osborne
     Alias: tobor
     Contact: rosborne@osbornepro.com
-    https://roberthosborne.com
-    
-    
+
+
 .INPUTS
     None
 
@@ -70,6 +69,11 @@
 .OUTPUTS
     System.Diagnostics.Eventing.Reader.EventLogntLogRecord
     Find-ReverseShell returns System.Diagnostics.Eventing.Reader.EventLogRecord objects.
+
+.LINK
+    https://www.powershellgallery.com/profiles/tobor
+    https://github.com/tobor88
+    https://roberthosborne.com
 
 #>
 Function Find-ReverseShell {
@@ -89,14 +93,14 @@ Function Find-ReverseShell {
         ) # End param
 
 
-    Write-Host "Checking for Reverse Shells that connect to a System.Net.Sockets.TcpListener object" -ForegroundColor Cyan
+    Write-Output "Checking for Reverse Shells that connect to a System.Net.Sockets.TcpListener object"
     $TcpListenerCheck = Get-WinEvent -LogName 'Security' -FilterXPath "*[System[EventID=4656 and TimeCreated[timediff(@SystemTime) <= 86400000]] and EventData[Data[@Name='SubjectUserName']!='paessler'] and EventData[Data[@Name='ObjectServer']='WS-Management Listener']]" -ErrorAction SilentlyContinue
 
     ## This part is a work in progress. Need to discover how to identify this connection.
-    # Write-Host "Checking for a Reverse Shell created by a tool such as PowerCat that execute Reverse Shell commands as a process using WSMAN"
+    # Write-Output "Checking for a Reverse Shell created by a tool such as PowerCat that execute Reverse Shell commands as a process using WSMAN"
     # $PowerCatListenerCheck = Get-WinEvent -LogName Security -FilterXPath "*[System[EventID=4656 and TimeCreated[timediff(@SystemTime) <= 86400000]] and EventData[Data[@Name='ObjectName']='\REGISTRY\MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\WSMAN'] and EventData[Data[@Name='SubjectUserName']!=`'$ComputerName$`']]" | Select Message | fl *
 
-    If ($TcpListenerCheck -ne $Null)
+    If ($Null -ne $TcpListenerCheck)
     {
 
         Write-Verbose "Event was found"
@@ -104,14 +108,14 @@ Function Find-ReverseShell {
 
         Write-Verbose "Building XML file"
         $TcpListenerCheck.ToXml() | Out-File -FilePath $FilePath
-        
-        Write-Host "Reverse Shell check has completed. A reverse shell has been discovered to exist from the last 24 hours.`n`n$FilePath contains the related events in XML format." -ForegroundColor 'Red'
+
+        Write-Output "Reverse Shell check has completed. A reverse shell has been discovered to exist from the last 24 hours.`n`n$FilePath contains the related events in XML format."
 
     }  # End If
     Else
     {
 
-        Write-Host "No Reverse shells have been discovered to exist in the last 24 hours." -ForegroundColor 'Green'
+        Write-Output "No Reverse shells have been discovered to exist in the last 24 hours."
 
     }  # End Else
 
