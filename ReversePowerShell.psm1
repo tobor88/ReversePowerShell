@@ -224,7 +224,7 @@ Function Start-Bind {
         $PortString = $Port.ToString()
         Write-Verbose "Creating listener on port $PortString"
         $Listener = [System.Net.Sockets.TcpListener]$Port
-        Write-Host "[*] PowerShell.exe is bound to port $PortString" -ForegroundColor "Green"
+        Write-Output "[*] PowerShell.exe is bound to port $PortString"
         $Listener.Start()
 
         While ($True)
