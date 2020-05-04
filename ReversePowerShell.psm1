@@ -63,7 +63,7 @@
 
 #>
 Function Start-Listener {
-    [CmdletBinding(SupportsShouldProcess)]
+    [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'Low')]
         param(
             [Parameter(
                 Mandatory=$False,
@@ -221,7 +221,7 @@ Function Start-Listener {
 
 #>
 Function Start-Bind {
-    [CmdletBinding(SupportsShouldProcess)]
+    [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'Low')]
         param(
             [Parameter(
                 Mandatory=$False,
