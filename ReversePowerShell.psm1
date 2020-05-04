@@ -46,7 +46,6 @@
     Author: Rob Osborne
     ALias: tobor
     Contact: rosborne@osbornepro.com
-    https://roberthsoborne.com
 
 
 .INPUTS
@@ -55,6 +54,12 @@
 
 .OUTPUTS
     None
+
+
+.LINK
+    https://github.com/tobor88
+    https://www.powershellgallery.com/profiles/tobor
+    https://roberthosborne.com
 
 #>
 Function Start-Listener {
@@ -207,6 +212,12 @@ Function Start-Listener {
 
 .OUTPUTS
     None
+
+
+.LINK
+    https://github.com/tobor88
+    https://www.powershellgallery.com/profiles/tobor
+    https://roberthosborne.com
 
 #>
 Function Start-Bind {
@@ -363,6 +374,12 @@ Function Start-Bind {
 
 .OUTPUTS
     None
+
+
+.LINK
+    https://github.com/tobor88
+    https://www.powershellgallery.com/profiles/tobor
+    https://roberthosborne.com
 
 #>
 Function Invoke-ReversePowerShell {
