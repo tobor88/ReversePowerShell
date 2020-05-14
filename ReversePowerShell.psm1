@@ -44,7 +44,7 @@
 
 .NOTES
     Author: Rob Osborne
-    ALias: tobor
+    Alias: tobor
     Contact: rosborne@osbornepro.com
 
 
@@ -225,7 +225,7 @@ Function Start-Bind {
         param(
             [Parameter(
                 Mandatory=$False,
-                Position=1,
+                Position=0,
                 ValueFromPipeline=$False,
                 HelpMessage='Enter a port to listen on. Valid ports are between 1 and 65535. Example: 1234')] # End Parameter
             [ValidateRange(1,65535)]
