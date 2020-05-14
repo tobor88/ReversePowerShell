@@ -419,7 +419,7 @@ Function Invoke-ReversePowerShell {
             [Parameter(
                 Mandatory=$False)]
             [Alias("C","Cls","Ch","Clear")]
-            [switch][bool]$ClearHistory,
+            [switch][bool]$ClearHistory
         ) # End param
 
     Write-Verbose "Creating a fun infinite loop. - The Shadow King (Amahl Farouk)"
