@@ -471,7 +471,7 @@ Function Invoke-ReversePowerShell {
                 {
 
                     # Executes commands
-                    $ExecuteCmd = Invoke-Expression -Command $Command -ErrorAction SilentlyContinue | Out-String
+                    $ExecuteCmd = Invoke-Expression -Command $Command 2>&1 | Out-String
                     $ExecuteCmdAgain  = $ExecuteCmd + "PS " + (Get-Location).Path + "> "
 
                 } # End Try
