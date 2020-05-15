@@ -3,6 +3,7 @@
 *******************************************
 #----------------------------------------------------------------------
 Module Version 1.1.1
+  - Added Find-ReversePowerShell cmdlet to the module manifest.
   - Added -ClearHistory parameter to Invoke-ReversePowerShell cmdlet.
   - Corrected some typos in the Help section.
 
