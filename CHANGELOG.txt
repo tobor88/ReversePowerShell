@@ -1,12 +1,12 @@
 *******************************************************************************************************
 #                              CHANGE LOG FOR REVERSEPOWERSHELL MODULE                                #
 *******************************************************************************************************
-Module Version 1.1.1
+Module Version 1.2
   - Added -ClearHistory parameter to Invoke-ReversePowerShell cmdlet.
   - Corrected some typos in the Help section.
   - Added signature to ensure the code has not been manipulated maliciously
 
-Module Version 1.0
+Module Version 1.1
   - Added a visual countdown timer to Invoke-ReversePowerShell cmdlet that counts down until next connection attempt
   - Added the ability to use Ctrl+C to stop the Start-Listener cmdlet
   - Added the ability to use Ctrl+C to stop the Start-Bind cmdlet
