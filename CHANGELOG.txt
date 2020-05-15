@@ -1,10 +1,10 @@
-*******************************************
-# CHANGE LOG FOR REVERSEPOWERSHELL MODULE #
-*******************************************
-#----------------------------------------------------------------------
+*******************************************************************************************************
+#                              CHANGE LOG FOR REVERSEPOWERSHELL MODULE                                #
+*******************************************************************************************************
 Module Version 1.1.1
   - Added -ClearHistory parameter to Invoke-ReversePowerShell cmdlet.
   - Corrected some typos in the Help section.
+  - Added signature to ensure the code has not been manipulated maliciously
 
 Module Version 1.0
   - Added a visual countdown timer to Invoke-ReversePowerShell cmdlet that counts down until next connection attempt
@@ -16,6 +16,31 @@ Module Version 1.0
   - Added initial creation of the Start-Listener cmdlet to the module manifest.
   - Added initial creation of the Start-Bind cmdlet to the module manifest.
   
+#--------------------------------------------------------------------------------------------------------
+
+=========================================================================================================
+#                              PSScriptAnalyzer Comments from Author                                    #
+=========================================================================================================
+1.) I see no reason to add a WhatIf parameter to Start-Listener as it is low impact and not worth adding.
+If someone wants to justify to me why it should have one I will add it.
+
+2.) Invoke-Expression can not be helped in this case as we want the person executing this to execute
+whatever commands they want.
+
+**********************************************************************************************************
+#                                PSSCRIPT ANALYZER RESULTS                                               #
+**********************************************************************************************************
+RuleName                        Severity     ScriptName Line  Message
+--------                        --------     ---------- ----  -------
+PSShouldProcess                 Warning      ReversePow 67    'Start-Listener' has the ShouldProcess attribute but does
+                                             erShell.ps       not call ShouldProcess/ShouldContinue.
+                                             m1
+PSAvoidUsingInvokeExpression    Warning      ReversePow 283   Invoke-Expression is used. Please remove Invoke-Expression
+                                             erShell.ps       from script and find other options instead.
+                                             m1
+PSAvoidUsingInvokeExpression    Warning      ReversePow 479   Invoke-Expression is used. Please remove Invoke-Expression
+                                             erShell.ps       from script and find other options instead.
+
 #----------------------------------------------------------------------
 # Command for updating Module Manifest
 # New-ModuleManifest -Path .\ReversePowerShell.psd1 -Author 'Robert H. Osborne' -CompanyName 'OsbornePro' -Copyright '(c) 2020 Robert H. Osborne. All rights reserved.' -ModuleVersion '1.1.1' -RootModule .\ReversePowerShell.psm1 -Description 'Functions that can be used to gain a bind or reverse shell with PowerShell.' -PowerShellVersion '5.0' -FunctionsToExport 'Start-Bind', 'Start-Listener', 'Invoke-ReversePowerShell','Find-ReversePowerShell' -CmdletsToExport 'Start-Bind', 'Start-Listener', 'Invoke-ReversePowerShell','Find-ReversePowerShell' -ProjectUri 'https://github.com/tobor88/ReversePowerShell' -LicenseUri 'https://raw.githubusercontent.com/tobor88/ReversePowerShell/master/LICENSE' 
