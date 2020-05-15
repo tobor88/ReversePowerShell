@@ -3,7 +3,6 @@
 *******************************************
 #----------------------------------------------------------------------
 Module Version 1.1.1
-  - Added Find-ReversePowerShell cmdlet to the module manifest.
   - Added -ClearHistory parameter to Invoke-ReversePowerShell cmdlet.
   - Corrected some typos in the Help section.
 
@@ -19,4 +18,4 @@ Module Version 1.0
   
 #----------------------------------------------------------------------
 # Command for updating Module Manifest
-# New-ModuleManifest -Path .\ReversePowerShell.psd1 -Author 'Robert H. Osborne' -CompanyName 'OsbornePro' -Copyright '(c) 2020 Robert H. Osborne. All rights reserved.' -ModuleVersion '1.1.1' -RootModule .\ReversePowerShell.psm1 -Description 'Functions that can be used to gain a bind or reverse shell with PowerShell.' -PowerShellVersion '5.0' -FunctionsToExport 'Start-Bind', 'Start-Listener', 'Invoke-ReversePowerShell' -CmdletsToExport 'Start-Bind', 'Start-Listener', 'Invoke-ReversePowerShell' -ProjectUri 'https://github.com/tobor88/ReversePowerShell' -LicenseUri 'https://raw.githubusercontent.com/tobor88/ReversePowerShell/master/LICENSE' 
+# New-ModuleManifest -Path .\ReversePowerShell.psd1 -Author 'Robert H. Osborne' -CompanyName 'OsbornePro' -Copyright '(c) 2020 Robert H. Osborne. All rights reserved.' -ModuleVersion '1.1.1' -RootModule .\ReversePowerShell.psm1 -Description 'Functions that can be used to gain a bind or reverse shell with PowerShell.' -PowerShellVersion '5.0' -FunctionsToExport 'Start-Bind', 'Start-Listener', 'Invoke-ReversePowerShell','Find-ReversePowerShell' -CmdletsToExport 'Start-Bind', 'Start-Listener', 'Invoke-ReversePowerShell','Find-ReversePowerShell' -ProjectUri 'https://github.com/tobor88/ReversePowerShell' -LicenseUri 'https://raw.githubusercontent.com/tobor88/ReversePowerShell/master/LICENSE' 
