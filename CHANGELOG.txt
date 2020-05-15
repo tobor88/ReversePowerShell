@@ -1,0 +1,21 @@
+*******************************************
+# CHANGE LOG FOR REVERSEPOWERSHELL MODULE #
+*******************************************
+#----------------------------------------------------------------------
+Module Version 1.1.1
+  - Added -ClearHistory parameter to Invoke-ReversePowerShell cmdlet.
+  - Corrected some typos in the Help section.
+
+Module Version 1.0
+  - Added a visual countdown timer to Invoke-ReversePowerShell cmdlet that counts down until next connection attempt
+  - Added the ability to use Ctrl+C to stop the Start-Listener cmdlet
+  - Added the ability to use Ctrl+C to stop the Start-Bind cmdlet
+ 
+Module Version 1.0
+  - Added initial creation of the Invoke-ReversePowerShell module to the manifest.
+  - Added initial creation of the Start-Listener cmdlet to the module manifest.
+  - Added initial creation of the Start-Bind cmdlet to the module manifest.
+  
+#----------------------------------------------------------------------
+# Command for updating Module Manifest
+# New-ModuleManifest -Path .\ReversePowerShell.psd1 -Author 'Robert H. Osborne' -CompanyName 'OsbornePro' -Copyright '(c) 2020 Robert H. Osborne. All rights reserved.' -ModuleVersion '1.1.1' -RootModule .\ReversePowerShell.psm1 -Description 'Functions that can be used to gain a bind or reverse shell with PowerShell.' -PowerShellVersion '5.0' -FunctionsToExport 'Start-Bind', 'Start-Listener', 'Invoke-ReversePowerShell' -CmdletsToExport 'Start-Bind', 'Start-Listener', 'Invoke-ReversePowerShell' -ProjectUri 'https://github.com/tobor88/ReversePowerShell' -LicenseUri 'https://raw.githubusercontent.com/tobor88/ReversePowerShell/master/LICENSE' 
