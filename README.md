@@ -93,9 +93,9 @@ Start-Listener -Port 8089
 ### INVOKE-REVERSEPOWERSHELL USAGE INFORMATION
 __SPECIAL FEATURES OF INVOKE-REVERSEPOWERSHELL__
 - __Re-Connect Loop__ This cmdlet automatically attempts to reconnect to a listener if a session get disconnected. As long as the powershell process is running it will attempt to connect back to a listener every 30 seconds. In available situations a 30 second timer is displayed. The countdown timer can be viewed in the image below.
-![Reconnection Timer Loop](https://raw.githubusercontent.com/tobor88/Bash/master/images/ReconnectTimer.png)
+![Reconnection Timer Loop](https://raw.githubusercontent.com/tobor88/ReversePowerShell/master/images/ReconnectTimer.png)
 - __Obfuscation__ parameter can be used to obfuscate executed commands using Base64. The Event Viewer will show logs such as the ones in the below image when this parameter is defined.
-![Obfuscation in Event Viewer](https://raw.githubusercontent.com/tobor88/Bash/master/images/PSObfuscatedEventLog.png)
+![Obfuscation in Event Viewer](https://raw.githubusercontent.com/tobor88/ReversePowerShell/master/images/PSObfuscatedEventLog.png)
 - __Clear History__ parameter can be used to clear the current sessions command history and log file. The purpose of this is to help keep clear text passwords from appearing in log files.
 
 #### ISSUE REVERSE SHELL CONNECTION
