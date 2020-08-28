@@ -163,7 +163,6 @@ Function Start-Listener {
 } # End Function Start-Listener
 
 
-#-------------------------------------------------------------------------------------------------------------------
 <#
 .SYNOPSIS
     This cmdlet is for binding the PowerShell application to a listening port.
@@ -327,7 +326,6 @@ Function Start-Bind {
 }  # End Function Start-Bind
 
 
-#-------------------------------------------------------------------------------------------------------------------
 <#
 .SYNOPSIS
     This cmdlet is for connecting PowerShell to a listening port on a target machine.
@@ -597,7 +595,6 @@ Function Invoke-ReversePowerShell {
 } # End Function Invoke-ReversePowerShell
 
 
-#-------------------------------------------------------------------------------------------------------------------
 <#
 .SYNOPSIS
     This cmdlet can be used to discover reverse shell connections from the past 24 hours. It will ignore connections from
