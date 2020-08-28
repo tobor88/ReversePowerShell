@@ -5,6 +5,9 @@ Module Version 1.3
   - Added -Obfuscate parameter to the Invoke-ReversePowerShell cmdlet.
   - Modified the Help sections of all cmdlets so PARAMETER shows up in Get-Help results.
   - Created ParameterSetNames for Invoke-ReversePowerShell cmdlet for the ability to attach to bind shells.
+  - Added ability to use -WhatIf through ShouldProcess on Start-Listener as suggested by PSScriptAnalyzer.
+  - Added ability to use -WhatIf through ShouldProcess on Start-Bind as suggested by PSScriptAnalyzer.
+  - Added -ComputerName parameter so it does something when specified in Find-ReversePowerShell.
 
 Module Version 1.2
   - Added -ClearHistory parameter to Invoke-ReversePowerShell cmdlet.
@@ -26,10 +29,7 @@ Module Version 1.0
 =========================================================================================================
 #                              PSScriptAnalyzer Comments from Author                                    #
 =========================================================================================================
-1.) I see no reason to add a WhatIf parameter to Start-Listener as it is low impact and not worth adding.
-If someone wants to justify to me why it should have one I will add it.
-
-2.) Invoke-Expression can not be helped in this case as we want the person executing this to execute
+1.) Invoke-Expression can not be helped in this case as we want the person executing this to execute
 whatever commands they want.
 
 **********************************************************************************************************
@@ -49,4 +49,4 @@ PSAvoidUsingInvokeExpression    Warning      ReversePow 479   Invoke-Expression 
 #----------------------------------------------------------------------
 # Command for updating Module Manifest
 #
-# New-ModuleManifest -Path .\ReversePowerShell.psd1 -Author 'Robert H. Osborne' -CompanyName 'OsbornePro' -Copyright '(c) 2020 Robert H. Osborne. All rights reserved.' -ModuleVersion '1.3.0' -RootModule .\ReversePowerShell.psm1 -Description 'Functions that can be used to gain a bind or reverse shell with PowerShell.' -PowerShellVersion '5.0' -FunctionsToExport 'Start-Bind','Start-Listener','Invoke-ReversePowerShell','Find-ReversePowerShell' -CmdletsToExport 'Start-Bind','Start-Listener','Invoke-ReversePowerShell','Find-ReversePowerShell' -ProjectUri 'https://github.com/tobor88/ReversePowerShell' -LicenseUri 'https://raw.githubusercontent.com/tobor88/ReversePowerShell/master/LICENSE' -IconURI 'https://img1.wsimg.com/isteam/ip/8f3c0f3f-85e4-413f-bd91-f19d4f317a5a/logo/967ca34c-6d9b-4d2f-9206-83481c35769d.png/:/rs=h:392/ll' -ReleaseNotes 'https://raw.githubusercontent.com/tobor88/ReversePowerShell/master/CHANGELOG.txt' -PowerShellHostName 'ConsoleHost' -PowerShellHostVersion '5.1.18362.752' -DotNetFrameworkVersion '3.5' -ClrVersion '3.5' -AliasesToExport @() -Tags 'PowerShell','CyberSecurity','InfoSec','PenetrationTesting','PenTesting','Shells','Security' -ProcessorArchitecture 'None' -HelpInfoUri 'https://raw.githubusercontent.com/tobor88/ReversePowerShell/master/README.md'
+# New-ModuleManifest -Path .\ReversePowerShell.psd1 -Author 'Robert H. Osborne' -CompanyName 'OsbornePro' -Copyright '(c) 2019 Robert H. Osborne. All rights reserved.' -ModuleVersion '1.3.0' -RootModule .\ReversePowerShell.psm1 -Description 'Functions that can be used to gain a bind or reverse shell with PowerShell.' -PowerShellVersion '5.0' -FunctionsToExport 'Start-Bind','Start-Listener','Invoke-ReversePowerShell','Find-ReversePowerShell' -CmdletsToExport 'Start-Bind','Start-Listener','Invoke-ReversePowerShell','Find-ReversePowerShell' -ProjectUri 'https://github.com/tobor88/ReversePowerShell' -LicenseUri 'https://raw.githubusercontent.com/tobor88/ReversePowerShell/master/LICENSE' -IconURI 'https://img1.wsimg.com/isteam/ip/8f3c0f3f-85e4-413f-bd91-f19d4f317a5a/logo/967ca34c-6d9b-4d2f-9206-83481c35769d.png/:/rs=h:392/ll' -ReleaseNotes 'https://raw.githubusercontent.com/tobor88/ReversePowerShell/master/CHANGELOG.txt' -PowerShellHostName 'ConsoleHost' -PowerShellHostVersion '5.1.18362.752' -DotNetFrameworkVersion '3.5' -ClrVersion '3.5' -AliasesToExport @() -Tags 'PowerShell','CyberSecurity','InfoSec','PenetrationTesting','PenTesting','Shells','Security' -ProcessorArchitecture 'None' -HelpInfoUri 'https://raw.githubusercontent.com/tobor88/ReversePowerShell/master/README.md'

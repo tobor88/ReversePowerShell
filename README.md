@@ -129,6 +129,15 @@ The below command is used to connect to a listening Bind Shell port. Any of the 
 Invoke-ReversePowerShell -Bind -IpAddress 192.168.0.10 -Port 8089
 ```
 
+#### FIND EVIDENCE OF REVERSE SHELL CONNECTION
+```powershell
+# Check the localhost for evidence of reverse shell in the event logs
+Find-ReversePowerShell
+
+# Checks remote computer DC01 for evidence of a shell connection and saves the event results to C:\Temp\results.xml
+Find-ReverseShell -ComputerName DC01.domain.com -FilePath C:\Temp\Results.xml
+```
+
 ---
 # MISC INFO
 #### FIREWALL AND BLOCKED PORTS

