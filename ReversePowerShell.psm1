@@ -23,9 +23,9 @@
 
 
 .NOTES
-    Author: Rob Osborne
-    Alias: tobor
-    Contact: rosborne@osbornepro.com
+Author: Rob Osborne
+Alias: tobor
+Contact: rosborne@osbornepro.com
 
 
 .INPUTS
@@ -188,9 +188,9 @@ Function Start-Listener {
 
 
 .NOTES
-    Author: Rob Osborne
-    ALias: tobor
-    Contact: rosborne@osbornepro.com
+Author: Rob Osborne
+Alias: tobor
+Contact: rosborne@osbornepro.com
 
 
 .INPUTS
@@ -372,9 +372,9 @@ Function Start-Bind {
 
 
 .NOTES
-    Author: Robert H. Osborne
-    ALias: tobor
-    Contact: rosborne@osbornepro.com
+Author: Robert H. Osborne
+Alias: tobor
+Contact: rosborne@osbornepro.com
 
 
 .LINK
@@ -625,9 +625,9 @@ Function Invoke-ReversePowerShell {
 
 
 .NOTES
-    Author: Robert H. Osborne
-    Alias: tobor
-    Contact: rosborne@osbornepro.com
+Author: Robert H. Osborne
+Alias: tobor
+Contact: rosborne@osbornepro.com
 
 
 .INPUTS
