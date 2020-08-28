@@ -35,17 +35,14 @@ whatever commands they want.
 **********************************************************************************************************
 #                                PSSCRIPT ANALYZER RESULTS                                               #
 **********************************************************************************************************
-RuleName                        Severity     ScriptName Line  Message
---------                        --------     ---------- ----  -------
-PSShouldProcess                 Warning      ReversePow 67    'Start-Listener' has the ShouldProcess attribute but does
-                                             erShell.ps       not call ShouldProcess/ShouldContinue.
-                                             m1
-PSAvoidUsingInvokeExpression    Warning      ReversePow 283   Invoke-Expression is used. Please remove Invoke-Expression
-                                             erShell.ps       from script and find other options instead.
-                                             m1
-PSAvoidUsingInvokeExpression    Warning      ReversePow 479   Invoke-Expression is used. Please remove Invoke-Expression
-                                             erShell.ps       from script and find other options instead.
-
+RuleName                            Severity     ScriptName Line  Message
+--------                            --------     ---------- ----  -------
+PSAvoidUsingInvokeExpression        Warning      ReversePow 290   Invoke-Expression is used. Please remove Invoke-Expression
+                                                 erShell.ps       from script and find other options instead.
+                                                 m1
+PSAvoidUsingInvokeExpression        Warning      ReversePow 526   Invoke-Expression is used. Please remove Invoke-Expression
+                                                 erShell.ps       from script and find other options instead.
+                                                 m1
 #----------------------------------------------------------------------
 # Command for updating Module Manifest
 #
