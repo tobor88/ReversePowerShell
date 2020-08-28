@@ -671,7 +671,7 @@ Function Find-ReverseShell {
                 ValueFromPipelineByPropertyName=$True,
                 HelpMessage="Enter a hostname, FQDN, or an IPv4 address and follow multiple values using a comma.")]
             [Alias("cn","Computer")]
-            [String[]]$ComputerName = $env:COMPUTERNAME,
+            [String[]]$ComputerName,
 
             [Parameter(
                 ParameterSetName="Remote",
@@ -690,6 +690,13 @@ Function Find-ReverseShell {
         ) # End param
 
 
+    If (!($ComputerName))
+    {
+
+        $ComputerName =  $env:COMPUTERNAME
+
+    }  # End If
+    
     Write-Output "Checking for Reverse Shells that connect to a System.Net.Sockets.TcpListener object"
     $TcpListenerCheck = Get-WinEvent -ComputerName $ComputerName -LogName 'Security' -FilterXPath "*[System[EventID=4656 and TimeCreated[timediff(@SystemTime) <= 86400000]] and EventData[Data[@Name='SubjectUserName']!='paessler'] and EventData[Data[@Name='ObjectServer']='WS-Management Listener']]" -ErrorVariable $CmdError
 
