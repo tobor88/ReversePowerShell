@@ -1,6 +1,6 @@
 # ReversePowerShell
 __See "Command Usage:" section below for command usage details__
-### NOW IN POWERSHELL GALLERY!!!
+### [NOW IN POWERSHELL GALLERY!!!](https://www.powershellgallery.com/packages/ReversePowerShell/1.3.1)
 ```powershell
 # Install Module
 Install-Module ReversePowerShell
