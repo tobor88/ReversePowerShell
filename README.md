@@ -12,10 +12,7 @@ Install-Module ReversePowerShell -Force
 ```
 ---
 
-Functions that can be used to gain Reverse Shells with PowerShell. Invoke-ReversePowerShell function can be used
-to connect to Start-Listener as well as netcat and Metasploit modules or whatever other listeners you use.
-This is a PowerShell module meaning it only contains functions/cmdlets to be imported into a PowerShell session.
-If you wish to execute one of the commands whenever the file is run just add the command you wish to execute to the bottom of the file.
+Functions that can be used to gain Reverse Shells with PowerShell. Invoke-ReversePowerShell function can be used to connect to Start-Listener as well as netcat and Metasploit modules or whatever other listeners you use. This is a PowerShell module meaning it only contains functions/cmdlets to be imported into a PowerShell session. If you wish to execute one of the commands whenever the file is run just add the command you wish to execute to the bottom of the file.
 
 #### BLUE TEAM DISCOVERY
 Find-ReverseShell.ps1 can be used to search the Windows Event Log for when a Reverse Shell is created that uses a System.Net.Sockets.TcpListener object. This will discover any reverse shell that creates a TcpListener object and not just the below module. This method does not catch PowerCat.ps1 which I am still looking for a good way to discover. This part is still a work in progress.
@@ -74,9 +71,7 @@ powershell.exe # Maybe but not sure on this one
 
 #### START BIND SHELL
 The below command can be executed to start a bind shell that connects the defined port to PowerShell.
-This command binds PowerShell to port 8088. I do not have a function that can connect to this. Netcat,
-ncat, metasploit, and other tools can be used to connect to this bind shell. I will add a tool in the
-future. You are able to use Ctrl + C to cancel the bind listener.
+This command binds PowerShell to port 8088. Invoke-ReversePowerShell, netcat, ncat, metasploit, and other tools can be used to connect to this bind shell. You are able to use Ctrl + C to cancel the bind listener.
 ```powershell
 Start-Bind -Port 8088
 ```
