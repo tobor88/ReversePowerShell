@@ -365,7 +365,7 @@ This cmdlet is for connecting PowerShell to a listening port on a target machine
 
 
 .DESCRIPTION
-Establishes a connection to a lsitening port on a remote machine effectively completing a reverse or bind shell.
+Establishes a connection to a listening port on a remote machine effectively completing a reverse or bind shell.
 
 
 .PARAMETER IpAddress
