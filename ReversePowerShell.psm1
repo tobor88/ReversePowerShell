@@ -287,9 +287,14 @@ Function Start-Bind {
             {
 
                 Write-Output "[*] Press Ctrl + C a couple of times in order to reuse the port you selected as a listener again"
+                If ($Listener.Pending())
+                {
 
-                $Client.Close()
-                $Listener.Stop()
+                    Write-Output "[*] Closing open port"
+                    $Client.Close()
+                    $Listener.Stop()
+
+                }  # End If
 
             }  # End Finally
 
