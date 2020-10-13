@@ -693,14 +693,14 @@ Function Find-ReverseShell {
     If ($ComputerName)
     {
 
-        Write-Output "Checking for Reverse Shells that connect to a System.Net.Sockets.TcpListener object, excluding ports opened by the paessler account"
+        Write-Output "[*] Checking for Reverse Shells that connect to a System.Net.Sockets.TcpListener object, excluding ports opened by the paessler account"
         $TcpListenerCheck = Get-WinEvent -ComputerName $ComputerName -LogName 'Security' -FilterXPath "*[System[EventID=4656 and TimeCreated[timediff(@SystemTime) <= 86400000]] and EventData[Data[@Name='SubjectUserName']!='paessler'] and EventData[Data[@Name='ObjectServer']='WS-Management Listener']]" -ErrorVariable $CmdError
 
     }  # End If
     Else
     {
 
-        Write-Output "Checking for Reverse Shells that connect to a System.Net.Sockets.TcpListener object, excluding ports opened by the paessler account"
+        Write-Output "[*] Checking for Reverse Shells that connect to a System.Net.Sockets.TcpListener object, excluding ports opened by the paessler account"
         $TcpListenerCheck = Get-WinEvent -LogName 'Security' -FilterXPath "*[System[EventID=4656 and TimeCreated[timediff(@SystemTime) <= 86400000]] and EventData[Data[@Name='SubjectUserName']!='paessler'] and EventData[Data[@Name='ObjectServer']='WS-Management Listener']]" -ErrorVariable $CmdError
 
     }  # End Else

@@ -2,8 +2,7 @@
 #                              CHANGE LOG FOR REVERSEPOWERSHELL MODULE                                #
 *******************************************************************************************************
 Module Version 1.3.2
-  - A connection from Invoke-ReversePowerShell to Start-Bind is now able to be made.
-  - I removed cmdlets that did not come out until PowerShell v5 to make this more backward compatible.
+  - I removed cmdlets that did not come out until PowerShell v5 to make this compatible with PowerShell v3.
 
 Module Version 1.3.1
   - Help Message was not displaying correctly because of comments between cmdlets.
