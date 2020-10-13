@@ -44,10 +44,10 @@ whatever commands they want.
 **********************************************************************************************************
 RuleName                            Severity     ScriptName Line  Message
 --------                            --------     ---------- ----  -------
-PSAvoidUsingInvokeExpression        Warning      ReversePow 290   Invoke-Expression is used. Please remove Invoke-Expression
+PSAvoidUsingInvokeExpression        Warning      ReversePow 317   Invoke-Expression is used. Please remove Invoke-Expression
                                                  erShell.ps       from script and find other options instead.
                                                  m1
-PSAvoidUsingInvokeExpression        Warning      ReversePow 526   Invoke-Expression is used. Please remove Invoke-Expression
+PSAvoidUsingInvokeExpression        Warning      ReversePow 556   Invoke-Expression is used. Please remove Invoke-Expression
                                                  erShell.ps       from script and find other options instead.
                                                  m1
 #----------------------------------------------------------------------

