@@ -533,6 +533,8 @@ Function Invoke-ReversePowerShell {
                             Clear-History
                             Clear-Content -Path $CmdHistoryFiles -Force -ErrorAction SilentlyContinue
 
+Set-PSReadlineOption –HistorySaveStyle SaveNothing
+
                         }  # End If
 
                         Write-Verbose "Closing client connection"
