@@ -1,6 +1,9 @@
 *******************************************************************************************************
 #                              CHANGE LOG FOR REVERSEPOWERSHELL MODULE                                #
 *******************************************************************************************************
+Module Version 1.3.5
+  - Verified all chars are encoded using ASCII
+
 Module Version 1.3.4
   - PowerShells new interpretation rules were preventing the import of commands. Translated " to ' 
 
@@ -54,13 +57,13 @@ whatever commands they want.
 **********************************************************************************************************
 RuleName                            Severity     ScriptName Line  Message
 --------                            --------     ---------- ----  -------
-PSAvoidUsingInvokeExpression        Warning      ReversePow 295   Invoke-Expression is used. Please remove Invoke-Expression
+PSAvoidUsingInvokeExpression        Warning      ReversePow 296   Invoke-Expression is used. Please remove Invoke-Expression
                                                  erShell.ps       from script and find other options instead.
                                                  m1
-PSAvoidUsingInvokeExpression        Warning      ReversePow 523   Invoke-Expression is used. Please remove Invoke-Expression
+PSAvoidUsingInvokeExpression        Warning      ReversePow 524   Invoke-Expression is used. Please remove Invoke-Expression
                                                  erShell.ps       from script and find other options instead.
                                                  m1
 #----------------------------------------------------------------------
 # Command for updating Module Manifest
 #
-# New-ModuleManifest -Path .\ReversePowerShell.psd1 -Author 'Robert H. Osborne' -CompanyName 'OsbornePro' -Copyright '(c) 2022 Robert H. Osborne. All rights reserved.' -ModuleVersion '1.3.4' -RootModule .\ReversePowerShell.psm1 -Description 'Functions that can be used to gain a bind or reverse shell with PowerShell.' -PowerShellVersion '3.0' -FunctionsToExport 'Start-Bind','Start-Listener','Invoke-ReversePowerShell','Find-ReverseShell' -CmdletsToExport 'Start-Bind','Start-Listener','Invoke-ReversePowerShell','Find-ReverseShell' -ProjectUri 'https://github.com/tobor88/ReversePowerShell' -LicenseUri 'https://raw.githubusercontent.com/tobor88/ReversePowerShell/master/LICENSE' -IconURI 'https://osbornepro.com/img/logo-nobackground-200.png' -ReleaseNotes 'https://raw.githubusercontent.com/tobor88/ReversePowerShell/master/CHANGELOG.txt' -AliasesToExport @() -Tags 'PowerShell','CyberSecurity','InfoSec','PenetrationTesting','PenTesting','Shells','Security' -ProcessorArchitecture 'None' -HelpInfoUri 'https://raw.githubusercontent.com/tobor88/ReversePowerShell/master/README.md'
+# New-ModuleManifest -Path .\ReversePowerShell.psd1 -Author 'Robert H. Osborne' -CompanyName 'OsbornePro' -Copyright '(c) 2022 Robert H. Osborne. All rights reserved.' -ModuleVersion '1.3.5' -RootModule .\ReversePowerShell.psm1 -Description 'Functions that can be used to gain a bind or reverse shell with PowerShell.' -FunctionsToExport 'Start-Bind','Start-Listener','Invoke-ReversePowerShell','Find-ReverseShell' -CmdletsToExport 'Start-Bind','Start-Listener','Invoke-ReversePowerShell','Find-ReverseShell' -ProjectUri 'https://github.com/tobor88/ReversePowerShell' -LicenseUri 'https://raw.githubusercontent.com/tobor88/ReversePowerShell/master/LICENSE' -IconURI 'https://osbornepro.com/img/logo-nobackground-200.png' -ReleaseNotes 'https://raw.githubusercontent.com/tobor88/ReversePowerShell/master/CHANGELOG.txt' -AliasesToExport @() -Tags 'PowerShell','CyberSecurity','InfoSec','PenetrationTesting','PenTesting','Shells','Security' -ProcessorArchitecture 'None' -HelpInfoUri 'https://raw.githubusercontent.com/tobor88/ReversePowerShell/master/README.md'
