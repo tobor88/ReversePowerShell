@@ -1,6 +1,9 @@
 *******************************************************************************************************
 #                              CHANGE LOG FOR REVERSEPOWERSHELL MODULE                                #
 *******************************************************************************************************
+Module Version 1.3.4
+  - PowerShells new interpretation rules were preventing the import of commands. Translated " to ' 
+
 Module Version 1.3.3
   - Updated Links in help information
   - Modified code to allow for copy and paste into PowerShell window
