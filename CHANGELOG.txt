@@ -1,6 +1,13 @@
 *******************************************************************************************************
 #                              CHANGE LOG FOR REVERSEPOWERSHELL MODULE                                #
 *******************************************************************************************************
+Module Version 1.3.3
+  - Updated Links in help information
+  - Modified code to allow for copy and paste into PowerShell window
+  - Added a message on how to resolve an error that prevents Start-Listener from executing
+  - Updated Find-ReverseShell to search EventID 4656. If none are found it searches EventID 5154
+  - Find-ReverseShell now attempts a WinRM connection on remote machinces. If that fails RPC is used
+  
 Module Version 1.3.2
   - I removed cmdlets that did not come out until PowerShell v5 to make this compatible with PowerShell v3.
   - Ctrl+C now closes the listening port allowing you to Start-Bind or Start-Listener on the same port after cancelling
