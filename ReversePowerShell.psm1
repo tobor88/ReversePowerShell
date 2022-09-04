@@ -709,7 +709,7 @@ Function Find-ReverseShell {
 
             $TcpListenerCheck = Invoke-Command -HideComputerName $ComputerName -UseSSL:$SSL -ScriptBlock {
             
-                Get-WinEvent -ComputerName $ComputerName -LogName 'Security' -FilterXPath "*[System[EventID=4656 and TimeCreated[timediff(@SystemTime) <= 86400000]] and EventData[Data[@Name='SubjectUserName']!='paessler'] and EventData[Data[@Name='ObjectServer']='WS-Management Listener']]" -ErrorVariable $CmdError
+                Get-WinEvent -ComputerName $ComputerName -LogName 'Security' -FilterXPath "*[System[EventID=4656 and TimeCreated[timediff(@SystemTime) <= 86400000]] and EventData[Data[@Name='SubjectUserName']!='paessler'] and EventData[Data[@Name='ObjectServer']='WS-Management Listener']]" -ErrorAction SilentlyContinue
                 If ($Null -eq $TcpListenerCheck) {
             
                     $TcpListenerCheck = Get-WinEvent -LogName 'Security' -FilterXPath "*[System[EventID=5154 and TimeCreated[timediff(@SystemTime) <= 86400000]] and EventData[Data[@Name='SourceAddress']!='127.0.0.1'] and EventData[Data[@Name='FilterRTID']=0] and EventData[Data[@Name='SourcePort']!=139]]" -ErrorVariable $CmdError
@@ -721,7 +721,7 @@ Function Find-ReverseShell {
 
         } Catch {
 
-            $TcpListenerCheck = Get-WinEvent -ComputerName $ComputerName -LogName 'Security' -FilterXPath "*[System[EventID=4656 and TimeCreated[timediff(@SystemTime) <= 86400000]] and EventData[Data[@Name='SubjectUserName']!='paessler'] and EventData[Data[@Name='ObjectServer']='WS-Management Listener']]" -ErrorVariable $CmdError
+            $TcpListenerCheck = Get-WinEvent -ComputerName $ComputerName -LogName 'Security' -FilterXPath "*[System[EventID=4656 and TimeCreated[timediff(@SystemTime) <= 86400000]] and EventData[Data[@Name='SubjectUserName']!='paessler'] and EventData[Data[@Name='ObjectServer']='WS-Management Listener']]" -ErrorAction SilentlyContinue
             If ($Null -eq $TcpListenerCheck) {
             
                 $TcpListenerCheck = Get-WinEvent -ComputerName $ComputerName -LogName 'Security' -FilterXPath "*[System[EventID=5154 and TimeCreated[timediff(@SystemTime) <= 86400000]] and EventData[Data[@Name='SourceAddress']!='127.0.0.1'] and EventData[Data[@Name='FilterRTID']=0] and EventData[Data[@Name='SourcePort']!=139]]" -ErrorVariable $CmdError
@@ -734,7 +734,7 @@ Function Find-ReverseShell {
     } Else {
 
         Write-Output "[*] Checking for Reverse Shells that connect to a System.Net.Sockets.TcpListener object, excluding ports opened by the paessler account"
-        $TcpListenerCheck = Get-WinEvent -LogName 'Security' -FilterXPath "*[System[EventID=4656 and TimeCreated[timediff(@SystemTime) <= 86400000]] and EventData[Data[@Name='SubjectUserName']!='paessler'] and EventData[Data[@Name='ObjectServer']='WS-Management Listener']]" -ErrorVariable $CmdError
+        $TcpListenerCheck = Get-WinEvent -LogName 'Security' -FilterXPath "*[System[EventID=4656 and TimeCreated[timediff(@SystemTime) <= 86400000]] and EventData[Data[@Name='SubjectUserName']!='paessler'] and EventData[Data[@Name='ObjectServer']='WS-Management Listener']]" -ErrorAction SilentlyContinue
         If ($Null -eq $TcpListenerCheck) {
         
             $TcpListenerCheck = Get-WinEvent -LogName 'Security' -FilterXPath "*[System[EventID=5154 and TimeCreated[timediff(@SystemTime) <= 86400000]] and EventData[Data[@Name='SourceAddress']!='127.0.0.1'] and EventData[Data[@Name='FilterRTID']=0] and EventData[Data[@Name='SourcePort']!=139]]" -ErrorVariable $CmdError
@@ -765,4 +765,3 @@ Function Find-ReverseShell {
     }  # End If Else
 
 } # End Function Find-ReverseShell
-
